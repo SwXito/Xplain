@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build:quarkus": "vue-cli-service build && cp -r dist/* ../main/resources/META-INF/resources/",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

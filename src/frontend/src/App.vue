@@ -1,17 +1,16 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app" class="container">
+    <HomeComponent/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import { defineAsyncComponent } from 'vue';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    HomeComponent: defineAsyncComponent(() => import('./components/HomeComponent.vue'))
   }
 }
 </script>
@@ -24,5 +23,21 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+
+  .container {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+  }
+
+  textarea {
+    width: 100%;
+    height: 200px;
+    font-family: monospace;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    box-sizing: border-box;
+  }
 }
 </style>

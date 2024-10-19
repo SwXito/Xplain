@@ -13,10 +13,9 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 public class LLMService {
-
-    public static void main(String... args) throws IOException {
+    public static void start(String modelName) throws IOException {
       ModelParameters modelParams = new ModelParameters()
-        .setModelFilePath("models/mistral-7b-instruct-v0.2.Q4_K_S.gguf")
+        .setModelFilePath("models/" + modelName)
         .setNGpuLayers(43);
       String system = "This is a conversation between User and Llama, a friendly chatbot.\n" +
         "Llama is helpful, kind, honest, good at writing, and never fails to answer any " +

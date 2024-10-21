@@ -7,7 +7,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
-public final class ModelLoader {
+public final class ModelDownloader {
 
   public static void loadAll() {
     try {

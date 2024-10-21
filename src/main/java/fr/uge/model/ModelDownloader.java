@@ -7,9 +7,9 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
-public final class ModelLoader {
+public final class ModelDownloader {
 
-  public static void loadAll() {
+  public static void downloadAll() {
     try {
       downloadModel("mistral-7b-instruct-v0.2.Q4_K_S.gguf", "https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.Q4_K_S.gguf");
       downloadModel("LLaMA2-13B-Tiefighter.Q8_0.gguf", "https://huggingface.co/KoboldAI/LLaMA2-13B-Tiefighter-GGUF/resolve/main/LLaMA2-13B-Tiefighter.Q8_0.gguf");
@@ -19,7 +19,7 @@ public final class ModelLoader {
     }
   }
 
-  public static void load(String modelName) {
+  public static void download(String modelName) {
     try {
       String modelUrl = switch (modelName) {
         case "mistral-7b-instruct-v0.2.Q4_K_S.gguf" -> "https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.Q4_K_S.gguf";

@@ -1,5 +1,6 @@
 package fr.uge.xplain;
 
+import fr.uge.model.ModelDownloader;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.MediaType;
@@ -24,7 +25,7 @@ public class Controller {
   @Produces(MediaType.APPLICATION_JSON)
   public Response receiveModel(String model) {
     Objects.requireNonNull(model);
-    System.out.println("Downloading " + model + "...");
+    ModelDownloader.download(model);
     return Response.ok(model).build();
   }
 }

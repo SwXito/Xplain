@@ -5,6 +5,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.MediaType;
 
+import java.io.IOException;
 import java.util.Objects;
 
 @Path("/api")
@@ -14,9 +15,10 @@ public class Controller {
   @Path("/endpoint")
   @Consumes(MediaType.TEXT_PLAIN)
   @Produces(MediaType.APPLICATION_JSON)
-  public Response receiveData(String data) {
+  public Response receiveData(String data) throws IOException {
     Objects.requireNonNull(data);
-    return Response.ok(data).build();
+    var output = Compiler.compile(data);
+    return Response.ok(output).build();
   }
 
   @POST

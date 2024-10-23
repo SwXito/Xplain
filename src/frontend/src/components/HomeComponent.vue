@@ -1,4 +1,5 @@
 <template>
+  <h1 class="display-5 fw-bold text-body-emphasis">Xplain - Java Debugger</h1>
   <div class="container mt-4">
     <textarea v-model="text" class="form-control" placeholder="Enter text here..."></textarea>
     <button @click="sendText" class="btn btn-primary mt-3">Send Text</button>

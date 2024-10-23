@@ -36,8 +36,7 @@ public class Compiler {
   private static void deleteFiles(File ...files){
     for(var file: files){
       if(file.exists()){
-        var deleted = file.delete();
-        System.out.println("Deleted file: " + file.getPath() + " - Success: " + deleted);
+        file.delete();
       }
     }
   }

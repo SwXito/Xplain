@@ -26,14 +26,12 @@ public class Compiler {
       errorWriter.write(diagnostic.toString() + "\n");}, null, null, compilationUnits).call();
     output = constructCompilerMessage(outputWriter.toString(), errorWriter.toString(), success);
     var classFile = new File(fileName + ".class");
-    if(!classFile.exists()){
-      throw new IOException("File not found: ");
-    }
     //Clean up
     deleteFiles(file, classFile);
     fileManager.close();
     return output;
   }
+
 
   private static void deleteFiles(File ...files){
     for(var file: files){

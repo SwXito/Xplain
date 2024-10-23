@@ -7,6 +7,16 @@
       <pre>{{ serverResponse }}</pre>
     </div>
   </div>
+  <div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      Select Model
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <li><a class="dropdown-item" @click="sendModel('mistral-7b-instruct-v0.2.Q4_K_S.gguf')">Mistral (light)</a></li>
+      <li><a class="dropdown-item" @click="sendModel('LLaMA2-13B-Tiefighter.Q8_0.gguf')">LLama2 (medium)</a></li>
+      <li><a class="dropdown-item" @click="sendModel('tiiuae-falcon-40b-instruct-Q8_0.gguf')">Falcon (heavy)</a></li>
+    </ul>
+  </div>
 </template>
 
 <script setup>
@@ -29,4 +39,18 @@ const sendText = async () => {
     console.error('Erreur lors de l\'envoi des données:', error);
   }
 };
+
+const sendModel = async (model) => {
+  try {
+    const response = await axios.post('http://localhost:8081/api/model', model, {
+      headers: {
+        'Content-Type': 'text/plain'
+      }
+    });
+    console.log('Response:', response.data);
+  } catch (error) {
+    console.error('Error sending model:', error);
+  }
+};
+
 </script>

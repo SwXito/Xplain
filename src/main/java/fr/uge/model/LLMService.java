@@ -13,7 +13,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 public class LLMService {
-    public static void start(String modelName) throws IOException {
+    public static String start(String modelName) throws IOException {
       ModelParameters modelParams = new ModelParameters()
         .setModelFilePath("models/" + modelName)
         .setNGpuLayers(43);
@@ -26,12 +26,11 @@ public class LLMService {
       try (LlamaModel model = new LlamaModel(modelParams)) {
         System.out.print(system);
         String prompt = system;
-        while (true) {
           prompt += "\nUser: ";
-          System.out.print("\nUser: ");
+           //System.out.print("\nUser: ");
           String input = reader.readLine();
           prompt += input;
-          System.out.print("Llama: ");
+          //System.out.print("Llama: ");
           prompt += "\nLlama: ";
           InferenceParameters inferParams = new InferenceParameters(prompt)
             .setTemperature(0.7f)
@@ -39,10 +38,10 @@ public class LLMService {
             .setMiroStat(MiroStat.V2)
             .setStopStrings("User:");
           for (LlamaOutput output : model.generate(inferParams)) {
-            System.out.print(output);
+            //System.out.print(output);
             prompt += output;
           }
-        }
+          return prompt;
       }
     }
 }

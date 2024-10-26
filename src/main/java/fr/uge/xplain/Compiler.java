@@ -2,43 +2,27 @@ package fr.uge.xplain;
 
 import javax.tools.ToolProvider;
 import java.io.*;
+import java.util.List;
 import java.util.Objects;
 
 public class Compiler {
 
   public static String compile(String input) throws IOException {
     Objects.requireNonNull(input);
-    String output = "";
-    var fileName = "Test";
-    var file = new File(fileName + ".java");
-    if(!file.createNewFile()){
-      throw new IOException("File already exists: " + file.getPath());
+    var fileName = Parser.getClassName(input).orElse("");
+    if(fileName.isEmpty()){
+      return "Compilation failed: No class name found in input";
     }
-    try(var writer = new BufferedWriter(new FileWriter(file))) {
-      writer.write(Parser.parse(input).orElse(input));
-    }
+    var sourceObject = new JavaSourceFromString(fileName, input);
     var compiler = ToolProvider.getSystemJavaCompiler();
     var fileManager = compiler.getStandardFileManager(null, null, null);
-    var compilationUnits = fileManager.getJavaFileObjects(file);
+    var compilationUnits = List.of(sourceObject);
     var outputWriter = new StringWriter();
     var errorWriter = new StringWriter();
     var success = compiler.getTask(new PrintWriter(outputWriter), fileManager, diagnostic -> {
       errorWriter.write(diagnostic.toString() + "\n");}, null, null, compilationUnits).call();
-    output = constructCompilerMessage(outputWriter.toString(), errorWriter.toString(), success);
-    var classFile = new File(fileName + ".class");
-    //Clean up
-    deleteFiles(file, classFile);
     fileManager.close();
-    return output;
-  }
-
-
-  private static void deleteFiles(File ...files){
-    for(var file: files){
-      if(file.exists()){
-        file.delete();
-      }
-    }
+    return constructCompilerMessage(outputWriter.toString(), errorWriter.toString(), success);
   }
 
   private static String constructCompilerMessage(String output, String error, boolean success){

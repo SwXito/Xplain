@@ -1,144 +1,84 @@
 package fr.uge.xplain;
 
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
 import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import static org.junit.jupiter.api.Assertions.*;
+class ParserTest {
 
-public class ParserTest {
-
-  // Test 1: Basic class replacement with no methods or fields
   @Test
-  public void correctReplaceBasicClass() throws IOException {
-    assertEquals("public class Test {}", Parser.parse("public class Animal {}").get());
+  void withValidClass() {
+    String javaCode = "public class MyClass { }";
+    Optional<String> className = Parser.getClassName(javaCode);
+    assertEquals(Optional.of("MyClass"), className);
   }
 
-  // Test 2: Correct replacement for a class with methods and fields
   @Test
-  public void correctReplaceWithMethodsAndFields() throws IOException {
-    assertEquals(
-      "public class Test {\n" +
-        "  private final String name;\n" +
-        "  public Test(String name) {\n" +
-        "    this.name = name;\n" +
-        "  }\n" +
-        "}\n",
-      Parser.parse(
-        "public class Animal {\n" +
-          "  private final String name;\n" +
-          "  public Animal(String name) {\n" +
-          "    this.name = name;\n" +
-          "  }\n" +
-          "}\n").get());
+  void withInterface() {
+    String javaCode = "public interface MyInterface { }";
+    Optional<String> className = Parser.getClassName(javaCode);
+    assertEquals(Optional.of("MyInterface"), className);
   }
 
-  // Test 3: Class with inner classes
   @Test
-  public void correctReplaceWithInnerClass() throws IOException {
-    assertEquals(
-      "public class Test {\n" +
-      "  class InnerAnimal {\n" +
-      "    private final String name;\n" +
-      "  }\n" +
-      "}\n",
-      Parser.parse(
-        "public class Animal {\n" +
-          "  class InnerAnimal {\n" +
-          "    private final String name;\n" +
-          "  }\n" +
-          "}\n").get());
+  void withEnum() {
+    String javaCode = "public enum MyEnum { VALUE1, VALUE2 }";
+    Optional<String> className = Parser.getClassName(javaCode);
+    assertEquals(Optional.of("MyEnum"), className);
   }
 
-  // Test 4: No class declaration in the input (returns empty)
   @Test
-  public void noClassDeclaration() throws IOException {
-    assertEquals(Optional.empty(), Parser.parse("public interface Animal {}"));
+  void withRecord() {
+    String javaCode = "public record MyRecord(String name, int age) { }";
+    Optional<String> className = Parser.getClassName(javaCode);
+    assertEquals(Optional.of("MyRecord"), className);
   }
 
-  // Test 5: Multiple class declarations (only replaces the first class name)
   @Test
-  public void multipleClassDeclarations() throws IOException {
-    assertEquals("public class Test {}\n" +
-        "public class Plant {}",
-      Parser.parse(
-        "public class Animal {}\n" +
-          "public class Plant {}").get());
+  void withClassAndInterface() {
+    String javaCode = """
+            public class OuterClass { }
+            public interface MyInterface { }
+        """;
+    Optional<String> className = Parser.getClassName(javaCode);
+    assertEquals(Optional.of("OuterClass"), className, "Should return the first encountered declaration.");
   }
 
-  // Test 6: Invalid input (empty string)
   @Test
-  public void emptyInput() throws IOException {
-    assertEquals("", Parser.parse("").orElse(""));
+  void withEnumAndClass() {
+    String javaCode = """
+            public enum MyEnum { VALUE1, VALUE2 }
+            public class MyClass { }
+        """;
+    Optional<String> className = Parser.getClassName(javaCode);
+    assertEquals(Optional.of("MyEnum"), className, "Should return the first encountered declaration.");
   }
 
-  // Test 7: Class with a generic type
   @Test
-  public void classWithGenericType() throws IOException {
-    assertEquals(
-      "public class Test<T> {\n" +
-        "  private T type;\n" +
-        "  public Test(T type) {\n" +
-        "    this.type = type;\n" +
-        "  }\n" +
-        "}\n",
-      Parser.parse(
-        "public class Animal<T> {\n" +
-          "  private T type;\n" +
-          "  public Animal(T type) {\n" +
-          "    this.type = type;\n" +
-          "  }\n" +
-          "}\n").get());
+  void withRecordAndEnum() {
+    String javaCode = """
+            public record MyRecord(String name, int age) { }
+            public enum MyEnum { VALUE1, VALUE2 }
+        """;
+    Optional<String> className = Parser.getClassName(javaCode);
+    assertEquals(Optional.of("MyRecord"), className, "Should return the first encountered declaration.");
   }
 
-  // Test 8: Class with comments (ensure comments changed)
   @Test
-  public void classWithComments() throws IOException {
-    assertEquals(
-      "/* Test class */\n" +
-        "public class Test {\n" +
-        "  // Some fields and methods\n" +
-        "  private final String name;\n" +
-        "}\n",
-      Parser.parse(
-        "/* Animal class */\n" +
-          "public class Animal {\n" +
-          "  // Some fields and methods\n" +
-          "  private final String name;\n" +
-          "}\n").get());
+  void withClassKeywordInComment() {
+    String javaCode = """
+            // This is a class comment
+            /* class CommentedClass { } */
+            public class ValidClass { }
+        """;
+    Optional<String> className = Parser.getClassName(javaCode);
+    assertEquals(Optional.of("ValidClass"), className, "Should ignore class keyword in comments.");
   }
 
-  // Test 9: Class name with numbers
   @Test
-  public void classWithNumberInName() throws IOException {
-    assertEquals(
-      "public class Test {\n" +
-      "  private final String name;\n" +
-      "}\n",
-      Parser.parse(
-        "public class Animal123 {\n" +
-          "  private final String name;\n" +
-          "}\n").get());
+  void withEmptyString() {
+    String javaCode = "";
+    Optional<String> className = Parser.getClassName(javaCode);
+    assertEquals(Optional.empty(), className, "Should return empty when no class, interface, enum, or record is defined.");
   }
-
-  // Test 10: Class keyword in a string (should not replace within strings)
-  @Test
-  public void classKeywordInString() throws IOException {
-    assertEquals(
-      "public class Test {\n" +
-        "  String description = \"This is a class example.\";\n" +
-        "}\n",
-      Parser.parse(
-        "public class Animal {\n" +
-          "  String description = \"This is a class example.\";\n" +
-          "}\n").get());
-  }
-
-  // Test 11: Null input should throw NullPointerException
-  @Test
-  public void nullInputShouldThrowException() {
-    assertThrows(NullPointerException.class, () -> Parser.parse(null));
-  }
-
 }

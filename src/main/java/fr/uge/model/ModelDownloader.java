@@ -34,6 +34,10 @@ public final class ModelDownloader {
   }
 
   private static void downloadModel(String modelName, String modelUrl) throws IOException, URISyntaxException {
+    var modelDir = new File("models");
+    if(!modelDir.exists()){
+      modelDir.mkdir();
+    }
     File modelFile = new File("models/" + modelName);
     if (!modelFile.exists()) {
       System.out.println("Downloading " + modelName + "...");

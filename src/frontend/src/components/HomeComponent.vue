@@ -13,18 +13,19 @@
 import {ref} from 'vue';
 import axios from "axios";
 
+
+
 const text = ref("");
 const serverResponse = ref(null);
-
 const sendText = async () => {
   try {
-    const response = await axios.post('http://localhost:8081/api/endpoint', text.value, {
+    const response = await axios.post('http://localhost:8081/api/generate', text.value, {
       headers: {
         'Content-Type': 'text/plain'
       }
     });
-    serverResponse.value = response.data;
-    console.log('Réponse du serveur:', response.data);
+    serverResponse.value = response.data
+    console.log('Réponse du serveur:', response);
   } catch (error) {
     console.error('Erreur lors de l\'envoi des données:', error);
   }

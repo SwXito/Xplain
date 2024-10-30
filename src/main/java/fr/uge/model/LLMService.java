@@ -6,42 +6,83 @@ import de.kherud.llama.ModelParameters;
 import de.kherud.llama.InferenceParameters;
 import de.kherud.llama.LlamaModel;
 import de.kherud.llama.args.MiroStat;
+import jakarta.inject.Inject;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jdk.jfr.EventFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
+import static jakarta.ws.rs.core.Response.status;
+
+@Path("/api/generate")
 public class LLMService {
-    public static String start(String modelName) throws IOException {
-      ModelParameters modelParams = new ModelParameters()
-        .setModelFilePath("models/" + modelName)
-        .setNGpuLayers(43);
-      String system = "This is a conversation between User and Llama, a friendly chatbot.\n" +
-        "Llama is helpful, kind, honest, good at writing, and never fails to answer any " +
-        "requests immediately and with precision.\n\n" +
-        "User: Hello Llama\n" +
-        "Llama: Hello.  How may I help you today?";
-      BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
-      try (LlamaModel model = new LlamaModel(modelParams)) {
-        System.out.print(system);
-        String prompt = system;
-          prompt += "\nUser: ";
-           //System.out.print("\nUser: ");
-          String input = reader.readLine();
-          prompt += input;
-          //System.out.print("Llama: ");
-          prompt += "\nLlama: ";
-          InferenceParameters inferParams = new InferenceParameters(prompt)
-            .setTemperature(0.7f)
-            .setPenalizeNl(true)
-            .setMiroStat(MiroStat.V2)
-            .setStopStrings("User:");
-          for (LlamaOutput output : model.generate(inferParams)) {
-            //System.out.print(output);
-            prompt += output;
-          }
-          return prompt;
-      }
+    private final ModelParameters modelParams = new ModelParameters()
+            .setModelFilePath("models/" + "mistral-7b-instruct-v0.2.Q4_K_S.gguf")
+            .setNGpuLayers(43);
+    private final LlamaModel model = new LlamaModel(modelParams);
+    private static String modelPath = "mistral-7b-instruct-v0.2.Q4_K_S.gguf";
+    private String prompt = "";
+
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response llmResponse(String prompt) throws IOException {
+        if (prompt.isEmpty()) {
+            return Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST).entity(Json.createObjectBuilder().add("error", "Prompt is empty").build()).build();
+
+        }
+        System.out.println("wow");
+        StringBuilder output = new StringBuilder();
+        this.prompt += "\nUser: " + prompt; // ajout de l'entré
+        this.prompt += "\nLama: ";
+        InferenceParameters inferParams = new InferenceParameters(this.prompt)
+                .setTemperature(0.7f)
+                .setPenalizeNl(true)
+                .setMiroStat(MiroStat.V2)
+                .setStopStrings("User:");
+                //.set("\n");
+        System.out.println("may be here");
+        output.append(model.complete(inferParams));
+        System.out.println("incredible");
+        this.prompt += output.toString();
+        System.out.println(output.toString());
+        return Response.ok(output.toString()).build();
+
     }
+
+
+//    public LLMService() {
+//        ModelParameters modelParams = new ModelParameters()
+//                .setModelFilePath("models/" + "mistral-7b-instruct-v0.2.Q4_K_S.gguf")
+//                .setNGpuLayers(43);
+//        this.model = new LlamaModel(modelParams);
+//    }
+//    public String start(String input) throws IOException {
+//        //Console.log(system);
+//          String prompt = "User: ";
+//           //System.out.print("\nUser: ");
+//          prompt += input;
+//          //System.out.print("Llama: ");
+//          prompt += "\nLlama: ";
+//          InferenceParameters inferParams = new InferenceParameters(prompt)
+//            .setTemperature(0.7f)
+//            .setPenalizeNl(true)
+//            .setMiroStat(MiroStat.V2)
+//            .setStopStrings("User:");
+//          for (LlamaOutput output : this.model.generate(inferParams)) {
+//            //System.out.print(output);
+//            prompt += output;
+//          }
+//          return prompt;
+//    }
 }

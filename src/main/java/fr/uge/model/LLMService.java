@@ -26,14 +26,16 @@ import static jakarta.ws.rs.core.Response.status;
 
 @Path("/api/generate")
 public class LLMService {
-    //private static String modelPath = "mistral-7b-instruct-v0.2.Q4_K_S.gguf";
-    private final String modelPath = "sr";
+    private final String modelPath = "mistral-7b-instruct-v0.2.Q4_K_S.gguf";
+    // private final String modelPath = "LLaMA2-13B-Tiefighter.Q8_0.gguf"; <--- vraiment nul
     private final ModelParameters modelParams = new ModelParameters()
             .setModelFilePath("models/" +modelPath)
-            .setNGpuLayers(43);
+            .setNGpuLayers(20);
     private final LlamaModel model = new LlamaModel(modelParams);
 
-    private String prompt = "";
+    private String prompt = "This is not a conversation between User and Llama\n" +
+            "Llama is helpful, and suggest only one thing upgradable" +
+            "please enter your java class\n\n";
 
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
@@ -48,13 +50,16 @@ public class LLMService {
         this.prompt += "\nUser: " + prompt; // ajout de l'entré
         this.prompt += "\nLama: ";
         InferenceParameters inferParams = new InferenceParameters(this.prompt)
-                .setTemperature(0.7f)
+                .setTemperature(0.5f)
                 .setPenalizeNl(true)
                 .setMiroStat(MiroStat.V2)
                 .setStopStrings("User:");
                 //.set("\n");
         System.out.println("may be here");
-        output.append(model.complete(inferParams));
+        for (LlamaOutput out : model.generate(inferParams)) {
+            System.out.print(out);
+            output.append(out.toString());
+        }
         System.out.println("incredible");
         this.prompt += output.toString();
         System.out.println(output.toString());

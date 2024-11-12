@@ -26,6 +26,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.11.3</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -38,6 +45,12 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.quarkus/quarkus-rest-jackson -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-jackson</artifactId>
+            <version>3.16.0</version>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -52,6 +65,7 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5</artifactId>
+
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -66,7 +80,6 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.11.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -166,7 +179,7 @@
                             <goal>install-node-and-npm</goal>
                         </goals>
                         <configuration>
-                            <nodeVersion>v16.13.1</nodeVersion> <!-- Assure-toi d'avoir la version compatible de Node.js -->
+                            <nodeVersion>v16.13.1</nodeVersion>
                             <workingDirectory>src/frontend</workingDirectory> <!-- Répertoire du frontend -->
                         </configuration>
                     </execution>

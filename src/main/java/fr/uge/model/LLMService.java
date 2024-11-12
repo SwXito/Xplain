@@ -26,11 +26,13 @@ import static jakarta.ws.rs.core.Response.status;
 
 @Path("/api/generate")
 public class LLMService {
+    //private static String modelPath = "mistral-7b-instruct-v0.2.Q4_K_S.gguf";
+    private final String modelPath = "sr";
     private final ModelParameters modelParams = new ModelParameters()
-            .setModelFilePath("models/" + "mistral-7b-instruct-v0.2.Q4_K_S.gguf")
+            .setModelFilePath("models/" +modelPath)
             .setNGpuLayers(43);
     private final LlamaModel model = new LlamaModel(modelParams);
-    private static String modelPath = "mistral-7b-instruct-v0.2.Q4_K_S.gguf";
+
     private String prompt = "";
 
     @POST

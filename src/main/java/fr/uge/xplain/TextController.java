@@ -16,9 +16,9 @@ public class TextController {
   @Produces(MediaType.APPLICATION_JSON)
   public Response receiveData(String data) throws IOException {
     Objects.requireNonNull(data);
-    String reponse = LLMService.start(data);
+    //String reponse = LLMService.start(data);
 
-    return Response.ok(reponse).build();
+    return Response.ok().build();
   }
 
 }

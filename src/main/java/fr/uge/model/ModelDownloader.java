@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
 public final class ModelDownloader {
+  //VOIR POUR CHANGER LES LLM
 
   public static void downloadAll() {
     try {

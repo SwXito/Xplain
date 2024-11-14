@@ -1,4 +1,4 @@
-package fr.uge.xplain;
+package fr.uge.utilities;
 
 import java.util.Optional;
 import java.util.regex.*;

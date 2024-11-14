@@ -1,5 +1,8 @@
 package fr.uge.xplain;
 
+import fr.uge.utilities.JavaSourceFromString;
+import fr.uge.utilities.Parser;
+
 import javax.tools.ToolProvider;
 import java.io.*;
 import java.util.List;

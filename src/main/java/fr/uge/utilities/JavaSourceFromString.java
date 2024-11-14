@@ -1,4 +1,4 @@
-package fr.uge.xplain;
+package fr.uge.utilities;
 
 import javax.tools.SimpleJavaFileObject;
 import java.net.URI;
@@ -17,7 +17,7 @@ public class JavaSourceFromString extends SimpleJavaFileObject {
    * @param name the name of the compilation unit represented by this file object
    * @param code the source code for the compilation unit represented by this file object
    */
-  JavaSourceFromString(String name, String code) {
+  public JavaSourceFromString(String name, String code) {
     super(URI.create("string:///" + name.replace('.','/') + Kind.SOURCE.extension),
         Kind.SOURCE);
     this.code = code;

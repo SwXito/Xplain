@@ -23,7 +23,7 @@ public final class ModelLoader {
     try {
       String modelUrl = switch (modelName) {
         case "mistral-7b-instruct-v0.2.Q4_K_S.gguf" -> "https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.Q4_K_S.gguf";
-        case "LLaMA2-13B-Tiefighter.Q8_0.gguf" -> "https://huggingface.co/KoboldAI/LLaMA2-13B-Tiefighter-GGUF/resolve/main/LLaMA2-13B-Tiefighter.Q8_0.gguf";
+        case "llama2-13b-tiefighter.Q4_0.gguf" -> "https://huggingface.co/TheBloke/LLaMA2-13B-Tiefighter-GGUF/resolve/main/llama2-13b-tiefighter.Q4_0.gguf";
         case "tiiuae-falcon-40b-instruct-Q8_0.gguf" -> "https://huggingface.co/maddes8cht/tiiuae-falcon-40b-instruct-gguf/resolve/main/tiiuae-falcon-40b-instruct-Q8_0.gguf";
         default -> throw new IllegalArgumentException("Unknown model name: " + modelName);
       };

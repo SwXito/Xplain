@@ -17,6 +17,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jdk.jfr.EventFactory;
 
+import javax.swing.text.html.parser.Entity;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -27,20 +28,21 @@ import static jakarta.ws.rs.core.Response.status;
 @Path("/api/generate")
 public class LLMService {
     private final String modelPath = "mistral-7b-instruct-v0.2.Q4_K_S.gguf";
-    // private final String modelPath = "LLaMA2-13B-Tiefighter.Q8_0.gguf"; <--- vraiment nul
+   // private final String modelPath = "llama2-13b-tiefighter.Q4_0.gguf"; //<--- vraiment nul
     private final ModelParameters modelParams = new ModelParameters()
             .setModelFilePath("models/" +modelPath)
-            .setNGpuLayers(20);
+            .setNGpuLayers(43);
     private final LlamaModel model = new LlamaModel(modelParams);
 
     private String prompt = "This is not a conversation between User and Llama\n" +
-            "Llama is helpful, and suggest only one thing upgradable" +
-            "please enter your java class\n\n";
+            "Llama is helpful, and suggest only one thing upgradable, with short sentences" +
+            "please enter your java class :\n\n";
 
     @POST
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response llmResponse(String prompt) throws IOException {
+    public Response llmResponse(Boxer boxer) throws IOException {
+        var prompt = boxer.content();
         if (prompt.isEmpty()) {
             return Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST).entity(Json.createObjectBuilder().add("error", "Prompt is empty").build()).build();
 
@@ -50,20 +52,21 @@ public class LLMService {
         this.prompt += "\nUser: " + prompt; // ajout de l'entré
         this.prompt += "\nLama: ";
         InferenceParameters inferParams = new InferenceParameters(this.prompt)
-                .setTemperature(0.5f)
+                .setTemperature(0.7f)
                 .setPenalizeNl(true)
                 .setMiroStat(MiroStat.V2)
                 .setStopStrings("User:");
                 //.set("\n");
         System.out.println("may be here");
         for (LlamaOutput out : model.generate(inferParams)) {
-            System.out.print(out);
+            //System.out.println(out);
             output.append(out.toString());
         }
         System.out.println("incredible");
         this.prompt += output.toString();
         System.out.println(output.toString());
-        return Response.ok(output.toString()).build();
+
+        return Response.ok(new Boxer("response LLm", output.toString())).build();
 
     }
 

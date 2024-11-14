@@ -17,7 +17,7 @@ import java.util.Map;
 public class Main {
     public static void main(String... args) throws IOException {
       ModelParameters modelParams = new ModelParameters()
-              .setModelFilePath("models/mistral-7b-instruct-v0.2.Q4_K_S.gguf")
+              .setModelFilePath("models/llama2-13b-tiefighter.Q4_0.gguf")
               .setNGpuLayers(20);
 
       String systemMessage = "This is not a conversation between User and Llama\n" +
@@ -56,7 +56,7 @@ public class Main {
     }
   public static void main2(String... args) throws IOException {
     var models = Map.of("light", "mistral-7b-instruct-v0.2.Q4_K_S.gguf",
-                        "medium", "LLaMA2-13B-Tiefighter.Q8_0.gguf",
+                        "medium", "llama2-13b-tiefighter.Q4_0.gguf",
                         "heavy", "tiiuae-falcon-40b-instruct-Q8_0.gguf");
     var modelName = models.get("medium");
     ModelLoader.load(modelName);

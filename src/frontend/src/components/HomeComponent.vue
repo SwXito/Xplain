@@ -19,12 +19,12 @@ const text = ref("");
 const serverResponse = ref(null);
 const sendText = async () => {
   try {
-    const response = await axios.post('http://localhost:8081/api/generate', text.value, {
+    const response = await axios.post('http://localhost:8081/api/generate', JSON.stringify({'contentDescription' : 'request', 'content' : text.value}), {
       headers: {
-        'Content-Type': 'text/plain'
+        'Content-Type': 'application/json'
       }
     });
-    serverResponse.value = response.data
+    serverResponse.value = response.data.content;
     console.log('Réponse du serveur:', response);
   } catch (error) {
     console.error('Erreur lors de l\'envoi des données:', error);

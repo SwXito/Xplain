@@ -25,14 +25,24 @@ public class Compiler {
     var success = compiler.getTask(new PrintWriter(outputWriter), fileManager, diagnostic -> {
       errorWriter.write(diagnostic.toString() + "\n");}, null, null, compilationUnits).call();
     fileManager.close();
+    deleteUselessFiles(new File(fileName + ".class"));
     return constructCompilerMessage(outputWriter.toString(), errorWriter.toString(), success);
   }
 
   private static String constructCompilerMessage(String output, String error, boolean success){
+    var res = "Compilation result:\n";
     if(success){
-      return "Compilation successful:\n" + output;
+      return res + "Compilation successful\n" + output;
     }
-    return "Compilation failed:\n" + error + output;
+    return  res + "Compilation failed\n" + error + output;
+  }
+
+  private static void deleteUselessFiles(File... files) {
+    for (File file : files) {
+      if(file.exists()){
+        file.delete();
+      }
+    }
   }
 
 }

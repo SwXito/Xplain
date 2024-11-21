@@ -4,7 +4,7 @@
     <textarea v-model="text" class="form-control" placeholder="Enter text here..."></textarea>
     <button @click="sendText" class="btn btn-primary mt-3">Send Text</button>
     <div v-if="serverResponse" class="mt-3 alert alert-success">
-      <p>Texte reçu du serveur :</p>
+      <p>Compiler message :</p>
       <pre>{{ serverResponse }}</pre>
     </div>
   </div>
@@ -30,15 +30,15 @@ const serverResponse = ref(null);
 const sendText = async () => {
   try {
     const response = await axios.post('http://localhost:8081/api/endpoint', {
-      ContentDescription: 'request',
+      contentDescription: 'request',
       content: text.value
     }, {
       headers: {
         'Content-Type': 'application/json'
       }
     });
-    serverResponse.value = response.data.content;
-    console.log('Réponse du serveur:', response.data.content);
+    serverResponse.value = response.data.compilerResponse;
+    console.log('Réponse du serveur:', response.data.compilerResponse);
   } catch (error) {
     console.error('Erreur lors de l\'envoi des données:', error);
   }

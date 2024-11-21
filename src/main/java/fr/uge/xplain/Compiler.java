@@ -30,11 +30,10 @@ public class Compiler {
   }
 
   private static String constructCompilerMessage(String output, String error, boolean success){
-    var res = "Compilation result:\n";
     if(success){
-      return res + "Compilation successful\n" + output;
+      return "Compilation successful\n" + output;
     }
-    return  res + "Compilation failed\n" + error + output;
+    return "Compilation failed\n" + error + output;
   }
 
   private static void deleteUselessFiles(File... files) {

@@ -1,4 +1,12 @@
 package fr.uge.utilities;
 
-public record ResponseBoxer() {
+import java.util.Objects;
+
+public record ResponseBoxer(String contentDescription, String classText, String compilerResponse, String llmResponse) {
+  public ResponseBoxer {
+    Objects.requireNonNull(contentDescription);
+    Objects.requireNonNull(classText);
+    Objects.requireNonNull(compilerResponse);
+    Objects.requireNonNull(llmResponse);
+  }
 }

@@ -5,41 +5,71 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
 public class XplainTable {
 
-    @Id
-    @GeneratedValue
-    private Long id;
-    @Lob
-    private String llmResponse;
-    private String compilerResponse;
-    private String classText;
+  @Id
+  @GeneratedValue
+  private Long id;
+  @Lob
+  private String llmResponse;
+  private String compilerResponse;
+  @Lob
+  private String classText;
+  private String history;
+  private String timestamp = LocalDateTime.now().toString();
 
-    public void setCompilerResponse(String compilerResponse) {
-        Objects.requireNonNull(compilerResponse);
-        this.compilerResponse = compilerResponse;
-    }
+  public void setCompilerResponse(String compilerResponse) {
+    Objects.requireNonNull(compilerResponse);
+    this.compilerResponse = compilerResponse;
+  }
 
-    public void setLlmResponse(String llmResponse) {
-        Objects.requireNonNull(llmResponse);
-        this.llmResponse = llmResponse;
-    }
+  public void setLlmResponse(String llmResponse) {
+    Objects.requireNonNull(llmResponse);
+    this.llmResponse = llmResponse;
+  }
 
-    public void setClassText(String classText) {
-        Objects.requireNonNull(classText);
-        this.classText = classText;
-    }
+  public void setClassText(String classText) {
+    Objects.requireNonNull(classText);
+    this.classText = classText;
+  }
 
-    @Override
-    public String toString(){
-        return "[CompilerResponse:"
-                + "\nid = " + id
-                + "\ncompilerResponse = " + compilerResponse
-                + "\nllmResponse = " + llmResponse
-                + "\nclassText = " + classText
-                + "]";
-    }
+  public void setHistory(String history) {
+    Objects.requireNonNull(history);
+    this.history = history;
+  }
+
+  public String getCompilerResponse() {
+    return compilerResponse;
+  }
+
+  public String getLlmResponse() {
+    return llmResponse;
+  }
+
+  public String getClassText() {
+    return classText;
+  }
+
+  public String getHistory(){
+    return history;
+  }
+
+  public String getTimestamp() {
+    return timestamp;
+  }
+
+  @Override
+  public String toString() {
+    return "XplainTable["
+      + "\nid = " + id
+      + "\ncompilerResponse:\n" + compilerResponse
+      + "\nllmResponse:\n" + llmResponse
+      + "\nclassText:\n" + classText
+      + "\nhistory:\n" + history
+      + "\n]\n";
+  }
 }

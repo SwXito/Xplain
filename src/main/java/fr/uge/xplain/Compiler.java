@@ -11,9 +11,10 @@ import java.util.Objects;
 public class Compiler {
 
   public static String compile(String input) throws IOException {
+    //NEED TO FIX : WE DON'T NEED CLASS NAME
     Objects.requireNonNull(input);
     var fileName = Parser.getClassName(input).orElse("");
-    if(fileName.isEmpty()){
+    if (fileName.isEmpty()) {
       return "Compilation failed: No class name found in input";
     }
     var sourceObject = new JavaSourceFromString(fileName, input);
@@ -23,14 +24,15 @@ public class Compiler {
     var outputWriter = new StringWriter();
     var errorWriter = new StringWriter();
     var success = compiler.getTask(new PrintWriter(outputWriter), fileManager, diagnostic -> {
-      errorWriter.write(diagnostic.toString() + "\n");}, null, null, compilationUnits).call();
+      errorWriter.write(diagnostic.toString() + "\n");
+    }, null, null, compilationUnits).call();
     fileManager.close();
     deleteUselessFiles(new File(fileName + ".class"));
     return constructCompilerMessage(outputWriter.toString(), errorWriter.toString(), success);
   }
 
-  private static String constructCompilerMessage(String output, String error, boolean success){
-    if(success){
+  private static String constructCompilerMessage(String output, String error, boolean success) {
+    if (success) {
       return "Compilation successful\n" + output;
     }
     return "Compilation failed\n" + error + output;
@@ -38,7 +40,7 @@ public class Compiler {
 
   private static void deleteUselessFiles(File... files) {
     for (File file : files) {
-      if(file.exists()){
+      if (file.exists()) {
         file.delete();
       }
     }

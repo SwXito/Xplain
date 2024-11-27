@@ -6,6 +6,7 @@ import de.kherud.llama.ModelParameters;
 import de.kherud.llama.InferenceParameters;
 import de.kherud.llama.LlamaModel;
 import de.kherud.llama.args.MiroStat;
+
 import java.io.IOException;
 import java.util.Objects;
 
@@ -13,7 +14,7 @@ public class LLMService {
 
   private final String modelPath = "mistral-7b-instruct-v0.2.Q4_K_S.gguf";
   private final ModelParameters modelParams = new ModelParameters()
-    .setModelFilePath("models/" +modelPath)
+    .setModelFilePath("models/" + modelPath)
     .setNGpuLayers(43);
   private final LlamaModel model = new LlamaModel(modelParams);
 

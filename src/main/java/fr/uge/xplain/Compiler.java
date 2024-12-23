@@ -8,10 +8,9 @@ import java.io.*;
 import java.util.List;
 import java.util.Objects;
 
-public class Compiler {
+public final class Compiler {
 
   public static String compile(String input) throws IOException {
-    //NEED TO FIX : WE DON'T NEED CLASS NAME
     Objects.requireNonNull(input);
     var fileName = Parser.getClassName(input).orElse("");
     if (fileName.isEmpty()) {

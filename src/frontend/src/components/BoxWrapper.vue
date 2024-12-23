@@ -8,11 +8,22 @@
 </script>
 
 <style scoped>
+textarea {
+  box-sizing: border-box;
+}
+
 .box-wrapper {
-  background-color: rgb(212, 188, 188);
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
   border: 1px solid black;
-  padding: 0.5rem; /* Ajout d'un espace intérieur pour l'esthétique */
-  border-radius: 5px; /* Optionnel : rend les coins légèrement arrondis */
+  padding: 0.5rem;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.d-flex {
+  gap: 1rem;
 }
 </style>

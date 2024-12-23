@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Path("/api")
-public class Controller {
+public final class Controller {
 
   @Inject
   DBService dbService;
@@ -33,8 +33,10 @@ public class Controller {
     var compilerResponse = Compiler.compile(classText);
     //llmService.llmResponse(classText, compilerResponse);
     var llmResponse = "";
-    dbService.createXplainTable(compilerResponse, llmResponse, classText);
-    return Response.ok(new ResponseBoxer("receiveData", classText, compilerResponse, llmResponse)).build();
+    var success = !compilerResponse.contains("failed");
+    dbService.createXplainTable(compilerResponse, llmResponse, classText, success);
+    var responseBoxer = new ResponseBoxer("receiveData", classText, compilerResponse, llmResponse, success);
+    return Response.ok(responseBoxer).build();
   }
 
   @POST
@@ -43,7 +45,6 @@ public class Controller {
   @Produces(MediaType.APPLICATION_JSON)
   public Response receiveModel(String model) {
     Objects.requireNonNull(model);
-    System.out.println(dbService.getAllResponses());
     ModelDownloader.download(model);
     return Response.ok(model).build();
   }

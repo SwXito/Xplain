@@ -21,6 +21,7 @@ public class XplainTable {
   private String classText;
   private String history;
   private String timestamp = LocalDateTime.now().toString();
+  private boolean success;
 
   public void setCompilerResponse(String compilerResponse) {
     Objects.requireNonNull(compilerResponse);
@@ -42,6 +43,10 @@ public class XplainTable {
     this.history = history;
   }
 
+  public void setSuccess(boolean success) {
+    this.success = success;
+  }
+
   public String getCompilerResponse() {
     return compilerResponse;
   }
@@ -60,6 +65,10 @@ public class XplainTable {
 
   public String getTimestamp() {
     return timestamp;
+  }
+
+  public boolean getSuccess() {
+    return success;
   }
 
   @Override

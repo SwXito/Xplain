@@ -10,7 +10,7 @@ import de.kherud.llama.args.MiroStat;
 import java.io.IOException;
 import java.util.Objects;
 
-public class LLMService {
+final public class LLMService {
 
   private final String modelPath = "mistral-7b-instruct-v0.2.Q4_K_S.gguf";
   private final ModelParameters modelParams = new ModelParameters()

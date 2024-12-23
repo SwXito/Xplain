@@ -6,26 +6,26 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 @ApplicationScoped
-public class DBService {
+public final class DBService {
 
   @Inject
   EntityManager em;
 
   @Transactional
-  public void createXplainTable(String compilerResponse, String LlmResponse, String classText) {
+  public void createXplainTable(String compilerResponse, String LlmResponse, String classText, boolean success) {
     Objects.requireNonNull(compilerResponse);
     Objects.requireNonNull(LlmResponse);
     Objects.requireNonNull(classText);
-    var r = new XplainTable();
-    r.setCompilerResponse(compilerResponse);
-    r.setLlmResponse(LlmResponse);
-    r.setClassText(classText);
-    r.setHistory(getFirstThreeLines(classText));
-    em.persist(r);
+    var table = new XplainTable();
+    table.setCompilerResponse(compilerResponse);
+    table.setLlmResponse(LlmResponse);
+    table.setClassText(classText);
+    table.setHistory(getFirstThreeLines(classText));
+    table.setSuccess(success);
+    em.persist(table);
   }
 
   private static String getFirstThreeLines(String classText) {
@@ -43,7 +43,7 @@ public class DBService {
     var dtoList = new ArrayList<HistoryDTO>();
     for (XplainTable response : responses) {
       var dto = new HistoryDTO(response.getClassText(), response.getLlmResponse(),
-        response.getCompilerResponse(), response.getHistory(), response.getTimestamp());
+        response.getCompilerResponse(), response.getHistory(), response.getTimestamp(), response.getSuccess());
       dtoList.add(dto);
     }
     return dtoList;

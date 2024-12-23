@@ -3,7 +3,7 @@ package fr.uge.utilities;
 import java.util.Objects;
 
 public record HistoryDTO(String classText, String llmResponse, String compilerResponse, String history,
-                         String timestamp) {
+                         String timestamp, boolean success) {
 
   public HistoryDTO {
     Objects.requireNonNull(classText);

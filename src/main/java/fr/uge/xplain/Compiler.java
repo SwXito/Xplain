@@ -1,33 +1,61 @@
 package fr.uge.xplain;
 
-import fr.uge.utilities.JavaSourceFromString;
-import fr.uge.utilities.Parser;
-
-import javax.tools.ToolProvider;
+import javax.tools.*;
 import java.io.*;
+import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 
 public final class Compiler {
 
+  private static class AnonymousSource extends SimpleJavaFileObject {
+    private final String code;
+
+    private AnonymousSource(String code) {
+      super(URI.create("string:///AnonymousSource.java"), Kind.SOURCE);
+      this.code = code;
+    }
+
+    @Override
+    public CharSequence getCharContent(boolean ignoreEncodingErrors) {
+      return code;
+    }
+  }
+
+  private static final class EmptyFileManager extends ForwardingJavaFileManager<JavaFileManager> {
+
+    private EmptyFileManager(JavaFileManager fileManager) {
+      super(fileManager);
+    }
+
+    @Override
+    public JavaFileObject getJavaFileForOutput(Location location, String className, JavaFileObject.Kind kind, FileObject sibling) {
+      return new SimpleJavaFileObject(URI.create("string:///" + className + kind.extension), kind) {
+        @Override
+        public OutputStream openOutputStream() {
+          // Return an OutputStream that does nothing in order to ignore .class files
+          return new OutputStream() {
+            @Override
+            public void write(int b) {}
+          };
+        }
+      };
+    }
+  }
+
   public static String compile(String input) throws IOException {
     Objects.requireNonNull(input);
-    var fileName = Parser.getClassName(input).orElse("");
-    if (fileName.isEmpty()) {
-      return "Compilation failed: No class name found in input";
-    }
-    var sourceObject = new JavaSourceFromString(fileName, input);
     var compiler = ToolProvider.getSystemJavaCompiler();
-    var fileManager = compiler.getStandardFileManager(null, null, null);
-    var compilationUnits = List.of(sourceObject);
     var outputWriter = new StringWriter();
     var errorWriter = new StringWriter();
-    var success = compiler.getTask(new PrintWriter(outputWriter), fileManager, diagnostic -> {
-      errorWriter.write(diagnostic.toString() + "\n");
-    }, null, null, compilationUnits).call();
-    fileManager.close();
-    deleteUselessFiles(new File(fileName + ".class"));
-    return constructCompilerMessage(outputWriter.toString(), errorWriter.toString(), success);
+    var standardFileManager = compiler.getStandardFileManager(null, null, null);
+    try (var emptyFileManager = new EmptyFileManager(standardFileManager)) {
+      var sourceObject = new AnonymousSource(input.replaceFirst("(?m)^\\s*public\\s+class\\s+", "class "));
+      var success = compiler.getTask(new PrintWriter(outputWriter), emptyFileManager, diagnostic -> {
+        errorWriter.write(diagnostic.toString() + "\n");
+      }, null, null, List.of(sourceObject)).call();
+      return constructCompilerMessage(outputWriter.toString(), errorWriter.toString(), success);
+    }
   }
 
   private static String constructCompilerMessage(String output, String error, boolean success) {
@@ -35,14 +63,6 @@ public final class Compiler {
       return "Compilation successful\n" + output;
     }
     return "Compilation failed\n" + error + output;
-  }
-
-  private static void deleteUselessFiles(File... files) {
-    for (File file : files) {
-      if (file.exists()) {
-        file.delete();
-      }
-    }
   }
 
 }

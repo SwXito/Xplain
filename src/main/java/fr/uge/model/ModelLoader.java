@@ -12,8 +12,8 @@ public final class ModelLoader {
   public static void loadAll() {
     try {
       downloadModel("mistral-7b-instruct-v0.2.Q4_K_S.gguf", "https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.Q4_K_S.gguf");
-      downloadModel("LLaMA2-13B-Tiefighter.Q8_0.gguf", "https://huggingface.co/KoboldAI/LLaMA2-13B-Tiefighter-GGUF/resolve/main/LLaMA2-13B-Tiefighter.Q8_0.gguf");
-      downloadModel("tiiuae-falcon-40b-instruct-Q8_0.gguf", "https://huggingface.co/maddes8cht/tiiuae-falcon-40b-instruct-gguf/resolve/main/tiiuae-falcon-40b-instruct-Q8_0.gguf");
+      downloadModel("mistral-7b-instruct-v0.2.Q2_K.gguf", "https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/blob/main/mistral-7b-instruct-v0.2.Q2_K.gguf");
+      downloadModel("mistral-7b-instruct-v0.2.Q5_K_S.gguf", "https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/blob/main/mistral-7b-instruct-v0.2.Q5_K_S.gguf");
     } catch (IOException | URISyntaxException e) {
       throw new AssertionError(e);
     }
@@ -23,8 +23,8 @@ public final class ModelLoader {
     try {
       String modelUrl = switch (modelName) {
         case "mistral-7b-instruct-v0.2.Q4_K_S.gguf" -> "https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.Q4_K_S.gguf";
-        case "llama2-13b-tiefighter.Q4_0.gguf" -> "https://huggingface.co/TheBloke/LLaMA2-13B-Tiefighter-GGUF/resolve/main/llama2-13b-tiefighter.Q4_0.gguf";
-        case "tiiuae-falcon-40b-instruct-Q8_0.gguf" -> "https://huggingface.co/maddes8cht/tiiuae-falcon-40b-instruct-gguf/resolve/main/tiiuae-falcon-40b-instruct-Q8_0.gguf";
+        case "mistral-7b-instruct-v0.2.Q2_K.gguf" -> "https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/blob/main/mistral-7b-instruct-v0.2.Q2_K.gguf";
+        case "mistral-7b-instruct-v0.2.Q5_K_S.gguf" -> "https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/blob/main/mistral-7b-instruct-v0.2.Q5_K_S.gguf";
         default -> throw new IllegalArgumentException("Unknown model name: " + modelName);
       };
       downloadModel(modelName, modelUrl);

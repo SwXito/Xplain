@@ -1,4 +1,4 @@
 package fr.uge.model;
 
-public record Boxer(String ContentDescription,String content) {
+public record Boxer(String contentDescription,String content) {
 }

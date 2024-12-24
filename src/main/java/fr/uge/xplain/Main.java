@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class Main {
-    public static void main(String... args) throws IOException {
+    public static void main2(String... args) throws IOException {
       ModelParameters modelParams = new ModelParameters()
               .setModelFilePath("models/mistral-7b-instruct-v0.2.Q2_K.gguf")
               .setNGpuLayers(20);
@@ -54,11 +54,11 @@ public class Main {
         }
       }
     }
-  public static void main2(String... args) throws IOException {
+  public static void main(String... args) throws IOException {
     var models = Map.of("medium", "mistral-7b-instruct-v0.2.Q4_K_S.gguf",
                         "light", "mistral-7b-instruct-v0.2.Q2_K.gguf",
-                        "heavy", "tiiuae-falcon-40b-instruct-Q8_0.gguf");
-    var modelName = models.get("medium");
+                        "heavy", "mistral-7b-instruct-v0.2.Q5_K_S.gguf");
+    var modelName = models.get("light");
     ModelLoader.load(modelName);
   }
 }

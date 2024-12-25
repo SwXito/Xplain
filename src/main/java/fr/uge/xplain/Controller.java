@@ -40,16 +40,6 @@ public final class Controller {
   }
 
   @POST
-  @Path("/model")
-  @Consumes(MediaType.TEXT_PLAIN)
-  @Produces(MediaType.APPLICATION_JSON)
-  public Response receiveModel(String model) {
-    Objects.requireNonNull(model);
-    ModelDownloader.download(model);
-    return Response.ok(model).build();
-  }
-
-  @POST
   @Path("/history")
   @Produces(MediaType.APPLICATION_JSON)
   public Response getHistory() {

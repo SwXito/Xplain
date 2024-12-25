@@ -1,6 +1,7 @@
 <template>
   <h1 class="display-5 fw-bold text-body-emphasis text-center">Xplain - Java Debugger</h1>
-  <div class="d-flex justify-content-center align-items-center" style="width: 100%; height: 80vh; display: flex; gap: 1rem;">
+  <div class="d-flex justify-content-center align-items-center"
+       style="width: 100%; height: 80vh; display: flex; gap: 1rem;">
     <!-- Historique -->
     <BoxWrapper>
       <div class="history-container">
@@ -20,7 +21,7 @@
               <div>{{ item.timestamp }}</div>
               <div>{{ item.history }}</div>
             </a>
-            <hr class="dropdown-divider" />
+            <hr class="dropdown-divider"/>
           </li>
         </ul>
       </div>
@@ -43,6 +44,18 @@
           <button @click="sendText" class="btn btn-primary w-100">Send Text</button>
         </div>
 
+        <div class="dropdown mt-1">
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                  data-bs-toggle="dropdown" aria-expanded="false">
+            Select Model
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <li><a class="dropdown-item" @click="sendModel('mistral-7b-instruct-v0.2.Q2_K.gguf')"> light </a></li>
+            <li><a class="dropdown-item" @click="sendModel('mistral-7b-instruct-v0.2.Q4_K_S.gguf')"> medium </a></li>
+            <li><a class="dropdown-item" @click="sendModel('mistral-7b-instruct-v0.2.Q5_K_S.gguf')"> heavy </a></li>
+          </ul>
+        </div>
+
         <!-- Message compilateur -->
         <div v-if="serverResponse"
              :class="{
@@ -54,16 +67,6 @@
           <pre>{{ serverResponse.message }}</pre>
         </div>
       </div>
-      <div class="dropdown">
-    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-      Select Model
-    </button>
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-      <li><a class="dropdown-item" @click="sendModel('mistral-7b-instruct-v0.2.Q4_K_S.gguf')">Mistral (light)</a></li>
-      <li><a class="dropdown-item" @click="sendModel('LLaMA2-13B-Tiefighter.Q8_0.gguf')">LLama2 (medium)</a></li>
-      <li><a class="dropdown-item" @click="sendModel('tiiuae-falcon-40b-instruct-Q8_0.gguf')">Falcon (heavy)</a></li>
-    </ul>
-  </div>
     </BoxWrapper>
 
     <!-- Conseils -->
@@ -105,7 +108,6 @@ const historyArray = ref([]); // Liste des historiques
 // Chargement des données à partir de l'historique
 const loadHistory = (history) => {
   text.value = history.classText || ''; // Texte à afficher
-  console.log(history.success)
   serverResponse.value = {
     success: history.success,
     message: history.compilerResponse || 'No message'
@@ -181,12 +183,12 @@ onMounted(async () => {
 
 const sendModel = async (model) => {
   try {
-    const respoe = await axios.post('http://localhost:8081/api/model', model, {
+    const response = await axios.post('http://localhost:8081/api/generate/model', model, {
       headers: {
         'Content-Type': 'text/plain'
       }
     });
-    console.log('Response:', respoe.data);
+    console.log('Response:', response.data);
   } catch (error) {
     console.error('Error sending model:', error);
   }

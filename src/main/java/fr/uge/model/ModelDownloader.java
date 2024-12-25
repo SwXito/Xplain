@@ -12,10 +12,10 @@ import java.util.Objects;
 
 public final class ModelDownloader {
 
-  record ModelInfo(String modelName, String url) {
+  public record ModelInfo(String modelName, String url) {
   }
 
-  private final static Map<String, ModelInfo> map = Map.of(
+  public final static Map<String, ModelInfo> map = Map.of(
     "light", new ModelInfo("mistral-7b-instruct-v0.2.Q2_K.gguf",
       "https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.Q2_K.gguf"),
     "medium", new ModelInfo("mistral-7b-instruct-v0.2.Q4_K_S.gguf",
@@ -65,6 +65,10 @@ public final class ModelDownloader {
     } else {
       System.out.println(modelName + " already exists, skipping download.");
     }
+  }
+
+  public static void main(String[] args) {
+    downloadAll();
   }
 }
 

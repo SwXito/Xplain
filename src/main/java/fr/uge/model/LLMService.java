@@ -1,10 +1,12 @@
 package fr.uge.model;
 
+import com.google.inject.Inject;
 import de.kherud.llama.ModelParameters;
 
 import de.kherud.llama.InferenceParameters;
 import de.kherud.llama.LlamaModel;
 import de.kherud.llama.args.MiroStat;
+import fr.uge.database.DBService;
 import fr.uge.utilities.SimpleBoxer;
 import io.smallrye.mutiny.Multi;
 import jakarta.ws.rs.*;
@@ -28,10 +30,11 @@ public class LLMService {
             .setNGpuLayers(10);
     private String prompt = "You are Llama an assistant that provide advice for java programmer\n" +
             "Llama is helpful, and suggest only 5 things upgradable, with short sentences" +
-            "Once the User submit a java class.\n\n";
+            "Once the User submit a java class with a compiler message.\n\n";
     private InferenceParameters inferParams = null;
     private LlamaModel model;
-
+//    @Inject
+//    DBService dbService;
     public LLMService() {
         Thread.ofPlatform().start(() -> {
             lock.lock();
@@ -43,10 +46,9 @@ public class LLMService {
 
     public void newRequest(String classPrompt, String compilerOutputPrompt) throws IOException {
         Objects.requireNonNull(classPrompt);
-
-        this.prompt += "\nUser: " + classPrompt + "\n\n" ;
-        // this.prompt += "\nUser: " + classPrompt + "\n\n" + "And this is the answer of the compiler :" +
-        // compilerOutputPrompt + "\n\nCan you give me some advices to improve my class ?";
+        Objects.requireNonNull(compilerOutputPrompt);
+        this.prompt += "\nUser: " + classPrompt + "\n\n" + "And this is the answer of the compiler :" +
+        compilerOutputPrompt + "\n\nCan you give me some advices to improve my class ?";
         this.prompt += "\nLama: ";
         lock.lock();
         try {

@@ -5,6 +5,7 @@ import java.io.*;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public final class Compiler {
 
@@ -48,9 +49,14 @@ public final class Compiler {
     var compiler = ToolProvider.getSystemJavaCompiler();
     var outputWriter = new StringWriter();
     var errorWriter = new StringWriter();
+    var pattern = Pattern.compile("(?m)^\\s*public\\s+(class|interface|enum|record)\\s+");
+    var matcher = pattern.matcher(input);
+    if (matcher.find()) {
+      input = matcher.replaceFirst(matcher.group(1) + " ");
+    }
     var standardFileManager = compiler.getStandardFileManager(null, null, null);
     try (var emptyFileManager = new EmptyFileManager(standardFileManager)) {
-      var sourceObject = new AnonymousSource(input.replaceFirst("(?m)^\\s*public\\s+class\\s+", "class "));
+      var sourceObject = new AnonymousSource(input);
       var success = compiler.getTask(new PrintWriter(outputWriter), emptyFileManager, diagnostic -> {
         errorWriter.write(diagnostic.toString() + "\n");
       }, null, null, List.of(sourceObject)).call();

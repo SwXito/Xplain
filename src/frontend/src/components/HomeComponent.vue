@@ -3,27 +3,29 @@
   <div class="d-flex justify-content-center align-items-center" style="width: 100%; height: 80vh; display: flex; gap: 1rem;">
     <!-- Historique -->
     <BoxWrapper>
-      <div class="text-center">History</div>
-      <div>
-        <ul class="dropdown-menu position-static d-grid gap-1 p-2 rounded-3 mx-0 border-0 shadow w-220px mt-3"
-            data-bs-theme="dark">
+      <div class="history-container">
+        <div class="text-center">History</div>
+        <ul
+            class="dropdown-menu position-static d-grid gap-1 p-2 rounded-3 mx-0 border-0 shadow w-100 mt-3"
+            data-bs-theme="dark"
+            style="flex-grow: 1; overflow-y: auto; max-height: 100%;"
+        >
           <li
               v-for="(item, index) in historyArray"
               :key="index"
               class="dynamic-div"
               @click="loadHistory(item)"
           >
-            <a>
+            <a class="dropdown-item">
               <div>{{ item.timestamp }}</div>
               <div>{{ item.history }}</div>
             </a>
-            <div>
-              <hr class="dropdown-divider">
-            </div>
+            <hr class="dropdown-divider" />
           </li>
         </ul>
       </div>
     </BoxWrapper>
+
 
     <!-- Conteneur flex pour zone de texte et boîte -->
     <BoxWrapper>
@@ -76,6 +78,7 @@
     </BoxWrapper>
   </div>
 </template>
+
 
 <script setup>
 import BoxWrapper from './BoxWrapper.vue'; // Importation du composant
@@ -153,3 +156,15 @@ onMounted(async () => {
   await fetchHistory();
 });
 </script>
+
+<style scoped>
+.history-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Permet à la boîte d’occuper tout l’espace disponible */
+}
+
+ul {
+  margin: 0; /* Supprime les marges inutiles */
+}
+</style>

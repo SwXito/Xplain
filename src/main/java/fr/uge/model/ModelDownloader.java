@@ -16,12 +16,12 @@ public final class ModelDownloader {
   }
 
   private final static Map<String, ModelInfo> map = Map.of(
-    "light", new ModelInfo("Llama-3.2-3B-Instruct.IQ2_XS.gguf",
-      "https://huggingface.co/MaziyarPanahi/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct.IQ2_XS.gguf"),
+    "light", new ModelInfo("mistral-7b-instruct-v0.2.Q2_K.gguf",
+      "https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/blob/main/mistral-7b-instruct-v0.2.Q2_K.gguf"),
     "medium", new ModelInfo("mistral-7b-instruct-v0.2.Q4_K_S.gguf",
       "https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.Q4_K_S.gguf"),
-    "heavy", new ModelInfo("SILMA-9B-Instruct-v1.0-Q4_K_M.gguf",
-      "https://huggingface.co/tensorblock/SILMA-9B-Instruct-v1.0-GGUF/resolve/main/SILMA-9B-Instruct-v1.0-Q4_K_M.gguf")
+    "heavy", new ModelInfo("mistral-7b-instruct-v0.2.Q5_K_S.gguf",
+      "https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/blob/main/mistral-7b-instruct-v0.2.Q5_K_S.gguf")
   );
 
   public static void downloadAll() {

@@ -54,6 +54,16 @@
           <pre>{{ serverResponse.message }}</pre>
         </div>
       </div>
+      <div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      Select Model
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <li><a class="dropdown-item" @click="sendModel('mistral-7b-instruct-v0.2.Q4_K_S.gguf')">Mistral (light)</a></li>
+      <li><a class="dropdown-item" @click="sendModel('LLaMA2-13B-Tiefighter.Q8_0.gguf')">LLama2 (medium)</a></li>
+      <li><a class="dropdown-item" @click="sendModel('tiiuae-falcon-40b-instruct-Q8_0.gguf')">Falcon (heavy)</a></li>
+    </ul>
+  </div>
     </BoxWrapper>
 
     <!-- Conseils -->
@@ -140,7 +150,20 @@ const sendText = async () => {
       success: response.data.success,
       message: response.data.compilerResponse || 'No message'
     };
-    llmResponse.value = response.data.llmResponse || 'No advice received.';
+    const sse = new EventSource('http://localhost:8081/api/generate/response'); // SERVEUR SENT EVENT
+    sse.addEventListener("message", (e) => {
+      const boxer = JSON.parse(e.data);
+      console.log(boxer);
+      if (boxer.contentDescription === "token") { // when token received
+        llmResponse.value += boxer.content;
+      }
+      if (boxer.contentDescription === "start") { // clean the other result
+        llmResponse.value = "";
+      }
+      if (boxer.contentDescription === "end") { // close the sse
+        sse.close();
+      }
+    });
   } catch (error) {
     console.error('Erreur lors de l\'envoi des données:', error);
   }
@@ -155,6 +178,19 @@ const toggleAdviceBox = () => {
 onMounted(async () => {
   await fetchHistory();
 });
+
+const sendModel = async (model) => {
+  try {
+    const respoe = await axios.post('http://localhost:8081/api/model', model, {
+      headers: {
+        'Content-Type': 'text/plain'
+      }
+    });
+    console.log('Response:', respoe.data);
+  } catch (error) {
+    console.error('Error sending model:', error);
+  }
+};
 </script>
 
 <style scoped>

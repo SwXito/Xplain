@@ -12,8 +12,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.MediaType;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 @Path("/api")
@@ -22,16 +20,18 @@ public final class Controller {
   @Inject
   DBService dbService;
 
+  @Inject
+  LLMService llmService;
+
   @POST
   @Path("/endpoint")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Response receiveData(SimpleBoxer data) throws IOException {
     Objects.requireNonNull(data);
-    var llmService = new LLMService();
     var classText = data.content();
     var compilerResponse = Compiler.compile(classText);
-    //llmService.llmResponse(classText, compilerResponse);
+    llmService.newRequest(classText, compilerResponse);
     var llmResponse = "";
     var success = !compilerResponse.contains("failed");
     dbService.createXplainTable(compilerResponse, llmResponse, classText, success);

@@ -1,26 +1,9 @@
 <template>
-  <div class="box-wrapper">
+  <div class="d-flex flex-column h-100 w-100 border p-3 rounded overflow-hidden border-info"
+       style="background-color: #607d8b; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
     <slot></slot> <!-- Place du contenu -->
   </div>
 </template>
 
 <script setup>
 </script>
-
-<style scoped>
-textarea {
-  box-sizing: border-box;
-}
-
-.box-wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  border: 1px solid black;
-  padding: 0.5rem;
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-</style>

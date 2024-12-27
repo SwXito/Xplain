@@ -1,67 +1,61 @@
 <template>
-  <h1 class="display-5 fw-bold text-body-emphasis text-center">Xplain - Java Debugger</h1>
+  <h1 class="display-5 fw-bold text-center" style="color:#37474f">Xplain - Java Debugger</h1>
+  <h4 class="fw-bold text-center" style="color:#546e7a">Current model : {{ modelName }}</h4>
+
   <div class="d-flex justify-content-center align-items-center"
-       style="width: 100%; height: 80vh; display: flex; gap: 1rem;">
+       style="width: 100%; height: 80vh; gap: 1rem;">
+
     <!-- Historique -->
     <BoxWrapper>
-      <div class="history-container">
-        <div class="text-center">History</div>
-        <ul
-            class="dropdown-menu position-static d-grid gap-1 p-2 rounded-3 mx-0 border-0 shadow w-100 mt-3"
-            data-bs-theme="dark"
-            style="flex-grow: 1; overflow-y: auto; max-height: 100%;"
-        >
+      <div class="d-flex flex-column h-100 p-2"
+           style="background-color: #b0bec5; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+        <div class="text-center mb-2 fw-bold" style="color: #eceff1;">History</div>
+        <ul class="list-group overflow-auto"
+            style="max-height: calc(100% - 2rem);">
           <li
               v-for="(item, index) in historyArray"
               :key="index"
-              class="dynamic-div"
+              class="list-group-item"
               @click="loadHistory(item)"
-          >
-            <a class="dropdown-item">
-              <div>{{ item.timestamp }}</div>
-              <div>{{ item.history }}</div>
-            </a>
-            <hr class="dropdown-divider"/>
+              style="background-color: #90a4ae; color: #ffffff;">
+            <div>{{ item.timestamp }}</div>
+            <div v-html="item.history.replace(/\n/g, '<br>')"></div>
           </li>
         </ul>
       </div>
     </BoxWrapper>
 
-
-    <!-- Conteneur flex pour zone de texte et boîte -->
+    <!-- Zone de texte -->
     <BoxWrapper>
-      <div class="text-center p-2 bg-light border rounded h-100 d-flex flex-column">
-        <!-- Zone de texte -->
-        <textarea
-            v-model="text"
-            class="form-control flex-grow-1 mb-2"
-            placeholder="Enter text here..."
-            style="resize: none; overflow: auto;">
+      <div class="text-center p-2 border rounded h-100 d-flex flex-column"
+           style="background-color: #eceff1; border-radius: 8px; border-color: #eceff1">
+        <textarea v-model="text"
+                  class="form-control flex-grow-1 mb-2"
+                  placeholder="Enter text here..."
+                  style="resize: none; overflow: auto; background-color: #607d8b; color: #ffffff; border: 1px solid #b0bec5;">
         </textarea>
-
-        <!-- Boutons -->
-        <div>
-          <button @click="sendText" class="btn btn-primary w-100">Send Text</button>
-        </div>
-
-        <div class="dropdown mt-1">
-          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
-                  data-bs-toggle="dropdown" aria-expanded="false">
+        <button @click="sendText"
+                class="btn btn-primary w-100"
+                style="background-color: #00acc1; color: #fff; border: none; border-radius: 5px; transition: all 0.3s ease-in-out;">
+          Send Text
+        </button>
+        <div class="dropdown mt-2">
+          <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="dropdownMenuButton"
+                  data-bs-toggle="dropdown" aria-expanded="false"
+                  style="background-color: #37474f; border: none; color: #fff;">
             Select Model
           </button>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <li><a class="dropdown-item" @click="sendModel('mistral-7b-instruct-v0.2.Q2_K.gguf')"> light </a></li>
-            <li><a class="dropdown-item" @click="sendModel('mistral-7b-instruct-v0.2.Q4_K_S.gguf')"> medium </a></li>
-            <li><a class="dropdown-item" @click="sendModel('mistral-7b-instruct-v0.2.Q5_K_S.gguf')"> heavy </a></li>
+            <li><a class="dropdown-item" @click="sendModel('light')">Light</a></li>
+            <li><a class="dropdown-item" @click="sendModel('medium')">Medium</a></li>
+            <li><a class="dropdown-item" @click="sendModel('heavy')">Heavy</a></li>
           </ul>
         </div>
-
-        <!-- Message compilateur -->
         <div v-if="serverResponse"
              :class="{
                'mt-3 alert': true,
-               'alert-success': serverResponse.success, // Si le compilateur retourne un succès
-               'alert-danger': !serverResponse.success  // Sinon, c'est une erreur
+               'alert-success': serverResponse.success,
+               'alert-danger': !serverResponse.success
              }">
           <p>Compiler message :</p>
           <pre>{{ serverResponse.message }}</pre>
@@ -72,23 +66,22 @@
     <!-- Conseils -->
     <BoxWrapper>
       <div class="d-flex flex-column h-100">
-        <button
-            @click="toggleAdviceBox"
-            class="btn btn-outline-primary w-100 mb-2">
+        <button @click="toggleAdviceBox"
+                class="btn btn-outline-info w-100 mb-2"
+                style="border-color: #00acc1; color: #00acc1;">
           Show advices
         </button>
-
         <div v-if="isAdviceBoxVisible" class="alert flex-grow-1 p-0">
-          <textarea
-              v-model="llmResponse"
-              class="form-control h-100"
-              readonly
-              rows="5"
-              style="resize: none; overflow: auto;">
+          <textarea v-model="llmResponse"
+                    class="form-control h-100"
+                    readonly
+                    rows="5"
+                    style="resize: none; overflow: auto; background-color: #607d8b; color: #fff; border: 1px solid #b0bec5;">
           </textarea>
         </div>
       </div>
     </BoxWrapper>
+
   </div>
 </template>
 
@@ -104,6 +97,7 @@ const serverResponse = ref(null); // Réponse du compilateur
 const llmResponse = ref(''); // Conseils
 const isAdviceBoxVisible = ref(false); // Visibilité de la boîte de conseils
 const historyArray = ref([]); // Liste des historiques
+const modelName = ref("light")
 
 // Chargement des données à partir de l'historique
 const loadHistory = (history) => {
@@ -178,10 +172,12 @@ const toggleAdviceBox = () => {
 
 // Chargement initial de l'historique
 onMounted(async () => {
+  document.body.style.backgroundColor = '#eceff1';
   await fetchHistory();
 });
 
 const sendModel = async (model) => {
+  modelName.value = model;
   try {
     const response = await axios.post('http://localhost:8081/api/generate/model', model, {
       headers: {
@@ -194,15 +190,3 @@ const sendModel = async (model) => {
   }
 };
 </script>
-
-<style scoped>
-.history-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%; /* Permet à la boîte d’occuper tout l’espace disponible */
-}
-
-ul {
-  margin: 0; /* Supprime les marges inutiles */
-}
-</style>

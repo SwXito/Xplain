@@ -35,12 +35,12 @@ public final class Controller {
     var success = !compilerResponse.contains("failed");
 
     // Écriture en base de données asynchrone
-    CompletableFuture.runAsync(() -> dbService.createXplainTable(compilerResponse, "", classText, success));
-
-    // Retourner une réponse indiquant que la génération va commencer
+    CompletableFuture.runAsync(() -> {
+      // Retourner une réponse indiquant que la génération va commencer
+      var id = dbService.createXplainTable(compilerResponse, "", classText, success);
+      llmService.newRequest(classText, compilerResponse, id);
+    });
     var responseBoxer = new ResponseBoxer("generationStarted", classText, compilerResponse, "", success);
-    var id = dbService.createXplainTable(compilerResponse, "", classText, success);
-    llmService.newRequest(classText, compilerResponse, id);
     return Response.ok(responseBoxer).build();
   }
 

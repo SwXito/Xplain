@@ -97,7 +97,7 @@ const serverResponse = ref(null); // Réponse du compilateur
 const llmResponse = ref(''); // Conseils
 const isAdviceBoxVisible = ref(false); // Visibilité de la boîte de conseils
 const historyArray = ref([]); // Liste des historiques
-const modelName = ref("light")
+const modelName = ref("light");
 
 // Chargement des données à partir de l'historique
 const loadHistory = (history) => {

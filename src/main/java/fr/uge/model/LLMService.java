@@ -34,7 +34,7 @@ public class LLMService {
   private String modelPath = "mistral-7b-instruct-v0.2.Q5_K_S.gguf"; // critique
   private final HashMap<String, ModelParameters> modelsParams = new HashMap<>();
     private final ConcurrentHashMap<String, LlamaModel> models = new ConcurrentHashMap<>(); // critique
-  private final LinkedBlockingQueue<RequestData> queue = new LinkedBlockingQueue<>();
+  private final ArrayBlockingQueue<RequestData> queue = new ArrayBlockingQueue<>(10);
   /***
    * This record is used to manage the request data
    * @param id the id of the in the database

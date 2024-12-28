@@ -32,6 +32,11 @@ public class XplainTable {
     Objects.requireNonNull(llmResponse);
     this.llmResponse = llmResponse;
   }
+  public void updateLlmResponse(String token) {
+    Objects.requireNonNull(token);
+    System.out.println(token);
+    this.llmResponse += token;
+  }
 
   public void setClassText(String classText) {
     Objects.requireNonNull(classText);
@@ -42,6 +47,8 @@ public class XplainTable {
     Objects.requireNonNull(history);
     this.history = history;
   }
+
+  public long getId() { return id; }
 
   public void setSuccess(boolean success) {
     this.success = success;

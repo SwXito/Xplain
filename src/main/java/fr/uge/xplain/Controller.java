@@ -31,7 +31,6 @@ public final class Controller {
     Objects.requireNonNull(data);
     var classText = data.content();
     var compilerResponse = Compiler.compile(classText);
-    llmService.newRequest(classText, compilerResponse);
 
     var success = !compilerResponse.contains("failed");
 
@@ -40,6 +39,8 @@ public final class Controller {
 
     // Retourner une réponse indiquant que la génération va commencer
     var responseBoxer = new ResponseBoxer("generationStarted", classText, compilerResponse, "", success);
+    var id = dbService.createXplainTable(compilerResponse, "", classText, success);
+    llmService.newRequest(classText, compilerResponse, id);
     return Response.ok(responseBoxer).build();
   }
 

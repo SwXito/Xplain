@@ -4,6 +4,7 @@ import fr.uge.utilities.HistoryDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
 
 import java.util.*;
@@ -15,7 +16,7 @@ public final class DBService {
   EntityManager em;
 
   @Transactional
-  public void createXplainTable(String compilerResponse, String LlmResponse, String classText, boolean success) {
+  public long createXplainTable(String compilerResponse, String LlmResponse, String classText, boolean success) {
     Objects.requireNonNull(compilerResponse);
     Objects.requireNonNull(LlmResponse);
     Objects.requireNonNull(classText);
@@ -26,6 +27,7 @@ public final class DBService {
     table.setHistory(getFirstThreeLines(classText));
     table.setSuccess(success);
     em.persist(table);
+    return table.getId();
   }
 
   private static String getFirstThreeLines(String classText) {
@@ -47,6 +49,12 @@ public final class DBService {
       dtoList.add(dto);
     }
     return dtoList;
+  }
+  @Transactional
+  public void updateLlmResponse(long id, String token) { // supprimer
+    var row = em.getReference(XplainTable.class, id);
+    var llmResponse = row.getLlmResponse() + token; // ajouter update llmresponse
+    row.setLlmResponse(llmResponse);
   }
 
 }

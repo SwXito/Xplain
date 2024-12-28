@@ -31,10 +31,10 @@ public final class Controller {
     Objects.requireNonNull(data);
     var classText = data.content();
     var compilerResponse = Compiler.compile(classText);
-    llmService.newRequest(classText, compilerResponse);
     var llmResponse = "";
     var success = !compilerResponse.contains("failed");
-    dbService.createXplainTable(compilerResponse, llmResponse, classText, success);
+    var id = dbService.createXplainTable(compilerResponse, llmResponse, classText, success);
+    llmService.newRequest(classText, compilerResponse, id);
     var responseBoxer = new ResponseBoxer("receiveData", classText, compilerResponse, llmResponse, success);
     return Response.ok(responseBoxer).build();
   }

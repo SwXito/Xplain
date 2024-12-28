@@ -147,7 +147,7 @@ const sendText = async () => {
       message: response.data.compilerResponse || 'No message'
     };
     const sse = new EventSource('http://localhost:8081/api/response'); // SERVEUR SENT EVENT
-    sse.addEventListener("message", (e) => {
+    sse.onmessage = (e) => {
       const boxer = JSON.parse(e.data);
       console.log(boxer);
       if (boxer.contentDescription === "token") { // when token received
@@ -159,7 +159,7 @@ const sendText = async () => {
       if (boxer.contentDescription === "end") { // close the sse
         sse.close();
       }
-    });
+    };
   } catch (error) {
     console.error('Erreur lors de l\'envoi des données:', error);
   }

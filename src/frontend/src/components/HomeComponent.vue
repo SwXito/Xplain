@@ -146,7 +146,7 @@ const sendText = async () => {
       success: response.data.success,
       message: response.data.compilerResponse || 'No message'
     };
-    const sse = new EventSource('http://localhost:8081/api/generate/response'); // SERVEUR SENT EVENT
+    const sse = new EventSource('http://localhost:8081/api/response'); // SERVEUR SENT EVENT
     sse.addEventListener("message", (e) => {
       const boxer = JSON.parse(e.data);
       console.log(boxer);
@@ -179,7 +179,7 @@ onMounted(async () => {
 const sendModel = async (model) => {
   modelName.value = model;
   try {
-    const response = await axios.post('http://localhost:8081/api/generate/model', model, {
+    const response = await axios.post('http://localhost:8081/api/model', model, {
       headers: {
         'Content-Type': 'text/plain'
       }

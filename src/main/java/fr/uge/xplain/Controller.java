@@ -2,10 +2,9 @@ package fr.uge.xplain;
 
 import fr.uge.database.DBService;
 import fr.uge.model.LLMService;
-import fr.uge.model.ModelDownloader;
-import fr.uge.utilities.HistoryDTO;
 import fr.uge.utilities.SimpleBoxer;
 import fr.uge.utilities.ResponseBoxer;
+import io.smallrye.mutiny.Multi;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
@@ -13,6 +12,7 @@ import jakarta.ws.rs.core.MediaType;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 @Path("/api")
 public final class Controller {
@@ -32,11 +32,24 @@ public final class Controller {
     var classText = data.content();
     var compilerResponse = Compiler.compile(classText);
     llmService.newRequest(classText, compilerResponse);
-    var llmResponse = "";
+
     var success = !compilerResponse.contains("failed");
-    dbService.createXplainTable(compilerResponse, llmResponse, classText, success);
-    var responseBoxer = new ResponseBoxer("receiveData", classText, compilerResponse, llmResponse, success);
+
+    // Écriture en base de données asynchrone
+    CompletableFuture.runAsync(() -> dbService.createXplainTable(compilerResponse, "", classText, success));
+
+    // Retourner une réponse indiquant que la génération va commencer
+    var responseBoxer = new ResponseBoxer("generationStarted", classText, compilerResponse, "", success);
     return Response.ok(responseBoxer).build();
+  }
+
+  @GET
+  @Path("/response")
+  @Produces(MediaType.SERVER_SENT_EVENTS)
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Multi<SimpleBoxer> streamResponse() {
+    // Appelle la méthode qui génère une réponse morceau par morceau
+    return llmService.generateCompleteResponse();
   }
 
   @POST
@@ -46,4 +59,13 @@ public final class Controller {
     return Response.ok(dbService.getAllResponses()).build();
   }
 
+  @POST
+  @Path("/model")
+  @Consumes(MediaType.TEXT_PLAIN)
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response receiveModel(String model) {
+    Objects.requireNonNull(model);
+    llmService.changeModel(model);
+    return Response.ok(model).build();
+  }
 }

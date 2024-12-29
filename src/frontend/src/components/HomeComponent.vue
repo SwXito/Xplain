@@ -80,6 +80,7 @@
           </textarea>
         </div>
       </div>
+      <BeatLoader v-if="isResponseGenerating"></BeatLoader>
     </BoxWrapper>
 
   </div>
@@ -88,6 +89,7 @@
 
 <script setup>
 import BoxWrapper from './BoxWrapper.vue'; // Importation du composant
+import BeatLoader from "@/components/BeatLoader.vue";
 import {ref, onMounted} from 'vue';
 import axios from 'axios';
 
@@ -96,6 +98,7 @@ const text = ref(''); // Texte actuel
 const serverResponse = ref(null); // Réponse du compilateur
 const llmResponse = ref(''); // Conseils
 const isAdviceBoxVisible = ref(false); // Visibilité de la boîte de conseils
+const isResponseGenerating = ref(false); // Chargement de la reponse
 const historyArray = ref([]); // Liste des historiques
 const modelName = ref("light")
 
@@ -155,8 +158,10 @@ const sendText = async () => {
       }
       if (boxer.contentDescription === "start") { // clean the other result
         llmResponse.value = "";
+        isResponseGenerating.value = true;
       }
       if (boxer.contentDescription === "end") { // close the sse
+        isResponseGenerating.value = false;
         sse.close();
       }
     };

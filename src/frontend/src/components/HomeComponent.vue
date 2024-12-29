@@ -98,15 +98,18 @@ const llmResponse = ref(''); // Conseils
 const isAdviceBoxVisible = ref(false); // Visibilité de la boîte de conseils
 const historyArray = ref([]); // Liste des historiques
 const modelName = ref("light");
+const generating = ref(false);
 
 // Chargement des données à partir de l'historique
 const loadHistory = (history) => {
-  text.value = history.classText || ''; // Texte à afficher
-  serverResponse.value = {
-    success: history.success,
-    message: history.compilerResponse || 'No message'
-  };
-  llmResponse.value = history.llmResponse || 'No advice received.'; // Conseils
+  if(!generating.value){
+    text.value = history.classText || ''; // Texte à afficher
+    serverResponse.value = {
+      success: history.success,
+      message: history.compilerResponse || 'No message'
+    };
+    llmResponse.value = history.llmResponse || 'No advice received.'; // Conseils
+  }
 };
 
 // Récupération de l'historique
@@ -132,36 +135,41 @@ const fetchHistory = async () => {
 };
 
 const sendText = async () => {
-  try {
-    const response = await axios.post('http://localhost:8081/api/endpoint', {
-      contentDescription: 'request',
-      content: text.value,
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    await fetchHistory(); // Rafraîchit l'historique
-    serverResponse.value = {
-      success: response.data.success,
-      message: response.data.compilerResponse || 'No message'
-    };
-    const sse = new EventSource('http://localhost:8081/api/response'); // SERVEUR SENT EVENT
-    sse.onmessage = (e) => {
-      const boxer = JSON.parse(e.data);
-      console.log(boxer);
-      if (boxer.contentDescription === "token") { // when token received
-        llmResponse.value += boxer.content;
-      }
-      if (boxer.contentDescription === "start") { // clean the other result
-        llmResponse.value = "";
-      }
-      if (boxer.contentDescription === "end") { // close the sse
-        sse.close();
-      }
-    };
-  } catch (error) {
-    console.error('Erreur lors de l\'envoi des données:', error);
+  if(!generating.value){
+    try {
+      const response = await axios.post('http://localhost:8081/api/endpoint', {
+        contentDescription: 'request',
+        content: text.value,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      await fetchHistory(); // Rafraîchit l'historique
+      serverResponse.value = {
+        success: response.data.success,
+        message: response.data.compilerResponse || 'No message'
+      };
+      const sse = new EventSource('http://localhost:8081/api/response'); // SERVEUR SENT EVENT
+      sse.onmessage = (e) => {
+        const boxer = JSON.parse(e.data);
+        console.log(boxer);
+        if (boxer.contentDescription === "token") { // when token received
+          llmResponse.value += boxer.content;
+        }
+        if (boxer.contentDescription === "start") { // clean the other result
+          llmResponse.value = "";
+          generating.value = true;
+        }
+        if (boxer.contentDescription === "end") { // close the sse
+          sse.close();
+          fetchHistory();
+          generating.value = false;
+        }
+      };
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi des données:', error);
+    }
   }
 };
 
@@ -177,16 +185,18 @@ onMounted(async () => {
 });
 
 const sendModel = async (model) => {
-  modelName.value = model;
-  try {
-    const response = await axios.post('http://localhost:8081/api/model', model, {
-      headers: {
-        'Content-Type': 'text/plain'
-      }
-    });
-    console.log('Response:', response.data);
-  } catch (error) {
-    console.error('Error sending model:', error);
+  if(!generating.value){
+    modelName.value = model;
+    try {
+      const response = await axios.post('http://localhost:8081/api/model', model, {
+        headers: {
+          'Content-Type': 'text/plain'
+        }
+      });
+      console.log('Response:', response.data);
+    } catch (error) {
+      console.error('Error sending model:', error);
+    }
   }
 };
 </script>

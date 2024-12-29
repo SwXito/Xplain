@@ -30,7 +30,6 @@ public final class ModelDownloader {
         downloadModel(v.modelName, v.url);
       } catch (IOException e) {
         System.out.println("Interruption while downloading " + v.modelName);
-        return;
       } catch (URISyntaxException e) {
         throw new AssertionError(e);
       }
@@ -44,7 +43,6 @@ public final class ModelDownloader {
       downloadModel(modelInfo.modelName, modelInfo.url);
     } catch (IOException e) {
       System.out.println("Interruption while downloading");
-      return;
     } catch (URISyntaxException e) {
       throw new AssertionError(e);
     }

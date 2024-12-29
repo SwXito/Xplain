@@ -9,8 +9,8 @@ import jakarta.inject.Inject;
 import fr.uge.utilities.SimpleBoxer;
 import io.smallrye.mutiny.Multi;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.ws.rs.core.Response;
 import org.jetbrains.annotations.NotNull;
+
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -27,16 +27,19 @@ public class LLMService {
   private final Lock writeLock = rwl.writeLock();
   private String modelPath = "mistral-7b-instruct-v0.2.Q2_K.gguf"; // critique
   private final HashMap<String, ModelParameters> modelsParams = new HashMap<>();
-    private final ConcurrentHashMap<String, LlamaModel> models = new ConcurrentHashMap<>(); // critique
+  private final ConcurrentHashMap<String, LlamaModel> models = new ConcurrentHashMap<>(); // critique
   private final ArrayBlockingQueue<RequestData> queue = new ArrayBlockingQueue<>(10);
-    private final ExecutorService executor = Executors.newFixedThreadPool(10); // Pool de threads
+  private final ExecutorService executor = Executors.newFixedThreadPool(10); // Pool de threads
+
   /***
    * This record is used to manage the request data
    * @param id the id of the in the database
    * @param parameters paramaters required to generate the response
    * @param model name of the model currently used
    */
-  private record RequestData(long id, InferenceParameters parameters, String model){}
+  private record RequestData(long id, InferenceParameters parameters, String model) {
+  }
+
   @Inject
   DBService dbService;
 
@@ -44,16 +47,15 @@ public class LLMService {
     ModelDownloader.map.forEach((k, v) -> modelsParams.put(v.modelName(),
       new ModelParameters()
         .setModelFilePath("models/" + v.modelName())
-              .setNGpuLayers(10)
-              .setNSequences(5) // genere jusqu'à 5 requete simultané
-              .setNParallel(5)));
-      executor.submit(() -> {
-          writeLock.lock();
-          try {
-              //ModelDownloader.map.forEach((k, v) -> { models.put(v.modelName(), /*new LlamaModel(modelsParams.get(v.modelName()))*/);});
-        models.put(modelPath, new LlamaModel(modelsParams.get(modelPath)));
+        .setNGpuLayers(0)
+        .setNSequences(5) // genere jusqu'à 5 requete simultané
+        .setNParallel(5)));
+    executor.submit(() -> {
+      writeLock.lock();
+      try {
+        ModelDownloader.map.forEach((k, v) -> models.put(v.modelName(), new LlamaModel(modelsParams.get(v.modelName()))));
       } finally {
-          writeLock.unlock();
+        writeLock.unlock();
       }
 
     });
@@ -64,7 +66,7 @@ public class LLMService {
     Objects.requireNonNull(compilerOutputPrompt);
     var prompt = getPrompt(classPrompt, compilerOutputPrompt);
     readLock.lock(); // pour le modelPath
-    queue.offer(new RequestData(id,new InferenceParameters(prompt)
+    queue.offer(new RequestData(id, new InferenceParameters(prompt)
       .setTemperature(0.5f)
       .setPenalizeNl(true)
       .setMiroStat(MiroStat.V2)
@@ -74,19 +76,19 @@ public class LLMService {
 
   private static @NotNull String getPrompt(String classPrompt, String compilerOutputPrompt) {
     String basePrompt = """
-            You are Llama an assistant that provide advice for java programmer
-            Llama is helpful, and suggest only 5 things upgradable, with short sentences
-            Once the User submit a java class with a compiler message.
-            """;
+      You are Llama an assistant that provide advice for java programmer
+      Llama is helpful, and suggest only 5 things upgradable, with short sentences
+      Once the User submit a java class with a compiler message.
+      """;
     var prompt = basePrompt + "\nUser: " + classPrompt + "\n\n" + "And this is the answer of the compiler :" +
-            compilerOutputPrompt + "\n\nCan you give me some advices to improve my class ?";
+      compilerOutputPrompt + "\n\nCan you give me some advices to improve my class ?";
     prompt += "\nLama: ";
     return prompt;
   }
 
   public Multi<SimpleBoxer> generateCompleteResponse() {
     return Multi.createFrom().emitter(emitter -> executor.submit(() -> {
-        readLock.lock(); // pour le model
+      readLock.lock(); // pour le model
       try {
         var data = queue.poll();
         if (data == null || models.get(data.model) == null) {
@@ -98,7 +100,7 @@ public class LLMService {
 
           for (var output : model.generate(data.parameters)) {
             emitter.emit(new SimpleBoxer("token", output.toString()));
-            builder.append(output.toString());
+            builder.append(output);
           }
           dbService.updateLlmResponse(data.id, builder.toString()); // ajout de la reponse complete dans la bdd
           emitter.emit(new SimpleBoxer("end", "")); // fin de la genereation
@@ -111,18 +113,7 @@ public class LLMService {
   }
 
   public void changeModel(String model) {
-//    Objects.requireNonNull(model);
-//    modelPath = ModelDownloader.map.get(model).modelName();
-//    return Response.ok(model).build();
-      writeLock.lock(); // pour le model
-      try {
-          var newModel = ModelDownloader.map.get(model).modelName();
-          System.out.println(model);
-          models.get(modelPath).close(); // ferme le vieux model
-          models.put(model, new LlamaModel(modelsParams.get(newModel))); // lance le nouveau model
-          modelPath = model; // nouveau model path
-      } finally {
-          writeLock.unlock();
-      }
+    Objects.requireNonNull(model);
+    modelPath = ModelDownloader.map.get(model).modelName();
   }
 }

@@ -12,10 +12,7 @@ import java.util.Objects;
 
 public final class ModelDownloader {
 
-  public record ModelInfo(String modelName, String url) {
-  }
-
-  public final static Map<String, ModelInfo> map = Map.of(
+  private final Map<String, ModelInfo> map = Map.of(
     "light", new ModelInfo("Mistral-7B-Instruct-v0.3.IQ2_XS.gguf",
       "https://huggingface.co/MaziyarPanahi/Mistral-7B-Instruct-v0.3-GGUF/resolve/main/Mistral-7B-Instruct-v0.3.IQ2_XS.gguf"),
     "medium", new ModelInfo("mistral-7b-instruct-v0.2.Q4_K_S.gguf",
@@ -24,23 +21,23 @@ public final class ModelDownloader {
       "https://huggingface.co/MaziyarPanahi/Mistral-7B-Instruct-v0.3-GGUF/resolve/main/Mistral-7B-Instruct-v0.3.Q6_K.gguf")
   );
 
-  public static void downloadAll() {
+  public void downloadAll() {
     map.forEach((k, v) -> {
       try {
-        downloadModel(v.modelName, v.url);
+        downloadModel(v.modelName(), v.url());
       } catch (IOException e) {
-        System.out.println("Interruption while downloading " + v.modelName);
+        System.out.println("Interruption while downloading " + v.modelName());
       } catch (URISyntaxException e) {
         throw new AssertionError(e);
       }
     });
   }
 
-  public static void download(String modelType) {
+  public void download(String modelType) {
     Objects.requireNonNull(modelType);
     try {
       var modelInfo = map.get(modelType);
-      downloadModel(modelInfo.modelName, modelInfo.url);
+      downloadModel(modelInfo.modelName(), modelInfo.url());
     } catch (IOException e) {
       System.out.println("Interruption while downloading");
     } catch (URISyntaxException e) {
@@ -65,8 +62,13 @@ public final class ModelDownloader {
     }
   }
 
+  public Map<String, ModelInfo> map(){
+    return Map.copyOf(map);
+  }
+
   public static void main(String[] args) {
-    downloadAll();
+    var modelDownloader = new ModelDownloader();
+    modelDownloader.downloadAll();
   }
 }
 

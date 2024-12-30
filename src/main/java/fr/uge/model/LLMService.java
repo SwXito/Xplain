@@ -9,9 +9,9 @@ import jakarta.inject.Inject;
 import fr.uge.utilities.SimpleBoxer;
 import io.smallrye.mutiny.Multi;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.ws.rs.core.Response;
 import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,7 +25,9 @@ public class LLMService {
   private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
   private final Lock readLock = rwl.readLock();
   private final Lock writeLock = rwl.writeLock();
-  private String modelPath = ModelDownloader.map.get("light").modelName(); // critique
+  private final ModelDownloader modelDownloader = new ModelDownloader();
+  private final Map<String, ModelInfo> modelsMap = modelDownloader.map();
+  private String modelPath = modelsMap.get("light").modelName(); // critique
   private final HashMap<String, ModelParameters> modelsParams = new HashMap<>();
   private final ConcurrentHashMap<String, LlamaModel> models = new ConcurrentHashMap<>(); // critique
   private final ArrayBlockingQueue<RequestData> queue = new ArrayBlockingQueue<>(10);
@@ -44,7 +46,7 @@ public class LLMService {
   DBService dbService;
 
   public LLMService() {
-    ModelDownloader.map.forEach((k, v) -> modelsParams.put(v.modelName(),
+    modelsMap.forEach((k, v) -> modelsParams.put(v.modelName(),
       new ModelParameters()
         .setModelFilePath("models/" + v.modelName())
         .setNGpuLayers(0)
@@ -53,7 +55,7 @@ public class LLMService {
     executor.submit(() -> {
       writeLock.lock();
       try {
-        ModelDownloader.map.forEach((k, v) -> models.put(v.modelName(), new LlamaModel(modelsParams.get(v.modelName()))));
+        modelsMap.forEach((k, v) -> models.put(v.modelName(), new LlamaModel(modelsParams.get(v.modelName()))));
       } finally {
           writeLock.unlock();
       }
@@ -97,7 +99,6 @@ public class LLMService {
           var model = models.get(data.model);
           emitter.emit(new SimpleBoxer("start", "")); // debut de la generation de la reponse
           var builder = new StringBuilder();
-
           for (var output : model.generate(data.parameters)) {
             emitter.emit(new SimpleBoxer("token", output.toString()));
             builder.append(output);
@@ -114,6 +115,6 @@ public class LLMService {
 
   public void changeModel(String model) {
     Objects.requireNonNull(model);
-    modelPath = ModelDownloader.map.get(model).modelName();
+    modelPath = modelsMap.get(model).modelName();
   }
 }

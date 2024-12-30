@@ -32,11 +32,6 @@ public class XplainTable {
     Objects.requireNonNull(llmResponse);
     this.llmResponse = llmResponse;
   }
-  public void updateLlmResponse(String token) {
-    Objects.requireNonNull(token);
-    System.out.println(token);
-    this.llmResponse += token;
-  }
 
   public void setClassText(String classText) {
     Objects.requireNonNull(classText);
@@ -78,14 +73,4 @@ public class XplainTable {
     return success;
   }
 
-  @Override
-  public String toString() {
-    return "XplainTable["
-      + "\nid = " + id
-      + "\ncompilerResponse:\n" + compilerResponse
-      + "\nllmResponse:\n" + llmResponse
-      + "\nclassText:\n" + classText
-      + "\nhistory:\n" + history
-      + "\n]\n";
-  }
 }

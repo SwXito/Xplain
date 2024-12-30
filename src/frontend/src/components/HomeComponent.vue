@@ -80,7 +80,7 @@
           </textarea>
         </div>
       </div>
-      <BeatLoader v-if="isResponseGenerating"></BeatLoader>
+      <BeatLoader v-if="generating"></BeatLoader>
     </BoxWrapper>
 
   </div>

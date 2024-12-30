@@ -80,6 +80,7 @@
           </textarea>
         </div>
       </div>
+      <BeatLoader v-if="isResponseGenerating"></BeatLoader>
     </BoxWrapper>
 
   </div>
@@ -88,6 +89,7 @@
 
 <script setup>
 import BoxWrapper from './BoxWrapper.vue'; // Importation du composant
+import BeatLoader from "@/components/BeatLoader.vue";
 import {ref, onMounted} from 'vue';
 import axios from 'axios';
 

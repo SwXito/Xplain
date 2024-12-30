@@ -9,8 +9,8 @@ import jakarta.inject.Inject;
 import fr.uge.utilities.SimpleBoxer;
 import io.smallrye.mutiny.Multi;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.core.Response;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -25,7 +25,7 @@ public class LLMService {
   private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
   private final Lock readLock = rwl.readLock();
   private final Lock writeLock = rwl.writeLock();
-  private String modelPath = "mistral-7b-instruct-v0.2.Q2_K.gguf"; // critique
+  private String modelPath = ModelDownloader.map.get("light").modelName(); // critique
   private final HashMap<String, ModelParameters> modelsParams = new HashMap<>();
   private final ConcurrentHashMap<String, LlamaModel> models = new ConcurrentHashMap<>(); // critique
   private final ArrayBlockingQueue<RequestData> queue = new ArrayBlockingQueue<>(10);
@@ -55,7 +55,7 @@ public class LLMService {
       try {
         ModelDownloader.map.forEach((k, v) -> models.put(v.modelName(), new LlamaModel(modelsParams.get(v.modelName()))));
       } finally {
-        writeLock.unlock();
+          writeLock.unlock();
       }
 
     });

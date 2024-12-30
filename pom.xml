@@ -46,11 +46,9 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest</artifactId>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/io.quarkus/quarkus-rest-jackson -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest-jackson</artifactId>
-            <version>3.16.0</version>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -60,6 +58,16 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-jdbc-h2</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-openapi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-swagger-ui</artifactId>
+        </dependency>
+
+
 
         <!-- Test dependencies -->
         <dependency>

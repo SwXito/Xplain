@@ -25,7 +25,7 @@ public class LLMService {
   private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
   private final Lock readLock = rwl.readLock();
   private final Lock writeLock = rwl.writeLock();
-  private String modelPath = "mistral-7b-instruct-v0.2.Q2_K.gguf"; // critique
+  private String modelPath = ModelDownloader.map.get("light").modelName(); // critique
   private final HashMap<String, ModelParameters> modelsParams = new HashMap<>();
     private final ConcurrentHashMap<String, LlamaModel> models = new ConcurrentHashMap<>(); // critique
   private final ArrayBlockingQueue<RequestData> queue = new ArrayBlockingQueue<>(10);
@@ -44,7 +44,7 @@ public class LLMService {
     ModelDownloader.map.forEach((k, v) -> modelsParams.put(v.modelName(),
       new ModelParameters()
         .setModelFilePath("models/" + v.modelName())
-              .setNGpuLayers(10)
+              .setNGpuLayers(0)
               .setNSequences(5) // genere jusqu'à 5 requete simultané
               .setNParallel(5)));
       executor.submit(() -> {

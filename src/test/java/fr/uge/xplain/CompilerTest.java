@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CompilerTest {
+public final class CompilerTest {
 
   @Test
   public void testCompileValidCode() throws IOException {

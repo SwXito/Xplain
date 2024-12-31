@@ -46,7 +46,9 @@ public class LLMService {
   DBService dbService;
 
   public LLMService() {
-    modelsMap.forEach((k, v) -> modelsParams.put(v.modelName(),
+    modelDownloader.downloadAll();
+    var modelsInfo = modelsMap.values();
+    modelsInfo.forEach(v -> modelsParams.put(v.modelName(),
       new ModelParameters()
         .setModelFilePath("models/" + v.modelName())
         .setNGpuLayers(0)
@@ -55,11 +57,10 @@ public class LLMService {
     executor.submit(() -> {
       writeLock.lock();
       try {
-        modelsMap.forEach((k, v) -> models.put(v.modelName(), new LlamaModel(modelsParams.get(v.modelName()))));
+        modelsInfo.forEach(v -> models.put(v.modelName(), new LlamaModel(modelsParams.get(v.modelName()))));
       } finally {
           writeLock.unlock();
       }
-
     });
   }
 

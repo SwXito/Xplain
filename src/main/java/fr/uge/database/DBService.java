@@ -49,6 +49,7 @@ public final class DBService {
     }
     return dtoList;
   }
+
   @Transactional
   public void updateLlmResponse(long id, String token) { // supprimer
     var row = em.getReference(XplainTable.class, id);

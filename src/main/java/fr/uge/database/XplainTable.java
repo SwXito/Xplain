@@ -13,7 +13,7 @@ public class XplainTable {
 
   @Id
   @GeneratedValue
-  private Long id;
+  private long id;
   @Lob
   private String llmResponse;
   private String compilerResponse;

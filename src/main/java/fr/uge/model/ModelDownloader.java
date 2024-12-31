@@ -65,10 +65,5 @@ public final class ModelDownloader {
   public Map<String, ModelInfo> map(){
     return Map.copyOf(map);
   }
-
-  public static void main(String[] args) {
-    var modelDownloader = new ModelDownloader();
-    modelDownloader.downloadAll();
-  }
 }
 

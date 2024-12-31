@@ -9,8 +9,8 @@ public final class XplainTableTest {
 
   @Test
   void testSetAndGetCompilerResponse() {
-    XplainTable table = new XplainTable();
-    String compilerResponse = "Compilation successful";
+    var table = new XplainTable();
+    var compilerResponse = "Compilation successful";
 
     table.setCompilerResponse(compilerResponse);
     assertEquals(compilerResponse, table.getCompilerResponse());
@@ -18,14 +18,14 @@ public final class XplainTableTest {
 
   @Test
   void testSetCompilerResponseNull() {
-    XplainTable table = new XplainTable();
+    var table = new XplainTable();
     assertThrows(NullPointerException.class, () -> table.setCompilerResponse(null));
   }
 
   @Test
   void testSetAndGetLlmResponse() {
-    XplainTable table = new XplainTable();
-    String llmResponse = "Generated code snippet";
+    var table = new XplainTable();
+    var llmResponse = "Generated code snippet";
 
     table.setLlmResponse(llmResponse);
     assertEquals(llmResponse, table.getLlmResponse());
@@ -33,14 +33,14 @@ public final class XplainTableTest {
 
   @Test
   void testSetLlmResponseNull() {
-    XplainTable table = new XplainTable();
+    var table = new XplainTable();
     assertThrows(NullPointerException.class, () -> table.setLlmResponse(null));
   }
 
   @Test
   void testSetAndGetClassText() {
-    XplainTable table = new XplainTable();
-    String classText = "public class Test { }";
+    var table = new XplainTable();
+    var classText = "public class Test { }";
 
     table.setClassText(classText);
     assertEquals(classText, table.getClassText());
@@ -48,14 +48,14 @@ public final class XplainTableTest {
 
   @Test
   void testSetClassTextNull() {
-    XplainTable table = new XplainTable();
+    var table = new XplainTable();
     assertThrows(NullPointerException.class, () -> table.setClassText(null));
   }
 
   @Test
   void testSetAndGetHistory() {
-    XplainTable table = new XplainTable();
-    String history = "User action history";
+    var table = new XplainTable();
+    var history = "User action history";
 
     table.setHistory(history);
     assertEquals(history, table.getHistory());
@@ -63,13 +63,13 @@ public final class XplainTableTest {
 
   @Test
   void testSetHistoryNull() {
-    XplainTable table = new XplainTable();
+    var table = new XplainTable();
     assertThrows(NullPointerException.class, () -> table.setHistory(null));
   }
 
   @Test
   void testSetAndGetSuccess() {
-    XplainTable table = new XplainTable();
+    var table = new XplainTable();
     table.setSuccess(true);
     assertTrue(table.getSuccess());
 
@@ -79,13 +79,13 @@ public final class XplainTableTest {
 
   @Test
   void testGetTimestamp() {
-    XplainTable table = new XplainTable();
+    var table = new XplainTable();
     assertNotNull(table.getTimestamp());
   }
 
   @Test
   void testGetIdDefault() {
-    XplainTable table = new XplainTable();
+    var table = new XplainTable();
     assertEquals(0, table.getId());
   }
 }

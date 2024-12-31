@@ -1,44 +1,50 @@
 <template>
+  <!-- Title and current model display -->
   <h1 class="display-5 fw-bold text-center" style="color:#37474f">Xplain - Java Debugger</h1>
   <h4 class="fw-bold text-center" style="color:#546e7a">Current model : {{ modelName }}</h4>
 
+  <!-- Main content area: flexible layout with three sections -->
   <div class="d-flex justify-content-center align-items-center"
        style="width: 100%; height: 80vh; gap: 1rem;">
 
-    <!-- Historique -->
+    <!-- History Section -->
     <BoxWrapper>
       <div class="d-flex flex-column h-100 p-2"
            style="background-color: #b0bec5; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
         <div class="text-center mb-2 fw-bold" style="color: #eceff1;">History</div>
         <ul class="list-group overflow-auto"
             style="max-height: calc(100% - 2rem);">
+          <!-- Loop through history array and display each item -->
           <li
               v-for="(item, index) in historyArray"
               :key="index"
               class="list-group-item"
               @click="loadHistory(item)"
               style="background-color: #90a4ae; color: #ffffff;">
-            <div>{{ item.timestamp }}</div>
-            <div v-html="item.history.replace(/\n/g, '<br>')"></div>
+          <div>{{ item.timestamp }}</div>
+          <div v-html="item.history.replace(/\n/g, '<br>')"></div> <!-- Display history with line breaks -->
           </li>
         </ul>
       </div>
     </BoxWrapper>
 
-    <!-- Zone de texte -->
+    <!-- Text input area -->
     <BoxWrapper>
       <div class="text-center p-2 border rounded h-100 d-flex flex-column"
            style="background-color: #eceff1; border-radius: 8px; border-color: #eceff1">
+        <!-- Text area for user input -->
         <textarea v-model="text"
                   class="form-control flex-grow-1 mb-2"
                   placeholder="Enter text here..."
                   style="resize: none; overflow: auto; background-color: #607d8b; color: #ffffff; border: 1px solid #b0bec5;">
         </textarea>
+        <!-- Button to send the entered text to the backend -->
         <button @click="sendText"
                 class="btn btn-primary w-100"
                 style="background-color: #00acc1; color: #fff; border: none; border-radius: 5px; transition: all 0.3s ease-in-out;">
           Send Text
         </button>
+        <!-- Dropdown menu to select the model -->
         <div class="dropdown mt-2">
           <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="dropdownMenuButton"
                   data-bs-toggle="dropdown" aria-expanded="false"
@@ -46,11 +52,13 @@
             Select Model
           </button>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <!-- List of model options -->
             <li><a class="dropdown-item" @click="sendModel('light')">Light</a></li>
             <li><a class="dropdown-item" @click="sendModel('medium')">Medium</a></li>
             <li><a class="dropdown-item" @click="sendModel('heavy')">Heavy</a></li>
           </ul>
         </div>
+        <!-- Display compiler response -->
         <div v-if="serverResponse"
              :class="{
                'mt-3 alert': true,
@@ -63,14 +71,16 @@
       </div>
     </BoxWrapper>
 
-    <!-- Conseils -->
+    <!-- Advice Section -->
     <BoxWrapper>
       <div class="d-flex flex-column h-100">
+        <!-- Button to toggle the advice box visibility -->
         <button @click="toggleAdviceBox"
                 class="btn btn-outline-info w-100 mb-2"
                 style="border-color: #00acc1; color: #00acc1;">
           Show advices
         </button>
+        <!-- Advice box for showing LLM responses -->
         <div v-if="isAdviceBoxVisible" class="alert flex-grow-1 p-0">
           <textarea v-model="llmResponse"
                     class="form-control h-100"
@@ -80,45 +90,45 @@
           </textarea>
         </div>
       </div>
+      <!-- BeatLoader displayed when generating is true -->
       <BeatLoader v-if="generating"></BeatLoader>
     </BoxWrapper>
 
   </div>
 </template>
 
-
 <script setup>
-import BoxWrapper from './BoxWrapper.vue'; // Importation du composant
-import BeatLoader from "@/components/BeatLoader.vue";
-import {ref, onMounted} from 'vue';
-import axios from 'axios';
+import BoxWrapper from './BoxWrapper.vue'; // Import the BoxWrapper component
+import BeatLoader from "@/components/BeatLoader.vue"; // Import BeatLoader for showing a loader during generation
+import {ref, onMounted} from 'vue'; // Import Vue functions for reactivity and lifecycle
+import axios from 'axios'; // Import axios for making HTTP requests
 
-// Données réactives
-const text = ref(''); // Texte actuel
-const serverResponse = ref(null); // Réponse du compilateur
-const llmResponse = ref(''); // Conseils
-const isAdviceBoxVisible = ref(false); // Visibilité de la boîte de conseils
-const historyArray = ref([]); // Liste des historiques
-const modelName = ref("light");
-const generating = ref(false);
+// Reactive data properties for the component
+const text = ref(''); // The current Java code entered by the user
+const serverResponse = ref(null); // The response from the compiler
+const llmResponse = ref(''); // The suggestions or advice generated by the LLM
+const isAdviceBoxVisible = ref(false); // Boolean to control visibility of the advice box
+const historyArray = ref([]); // Array to store the history of requests
+const modelName = ref("light"); // Current selected model
+const generating = ref(false); // Boolean to indicate if the LLM is generating suggestions
 
-// Chargement des données à partir de l'historique
+// Function to load a selected history item into the input area and display its responses
 const loadHistory = (history) => {
   if(!generating.value){
-    text.value = history.classText || ''; // Texte à afficher
+    text.value = history.classText || ''; // Display the class text from history
     serverResponse.value = {
       success: history.success,
       message: history.compilerResponse || 'No message'
     };
-    llmResponse.value = history.llmResponse || 'No advice received.'; // Conseils
+    llmResponse.value = history.llmResponse || 'No advice received.'; // Show LLM response from history
   }
 };
 
-// Récupération de l'historique
+// Function to fetch the history of processed requests from the backend
 const fetchHistory = async () => {
   try {
     const response = await axios.post('http://localhost:8081/api/history');
-    historyArray.value = response.data;
+    historyArray.value = response.data; // Store the fetched history data
     historyArray.value.forEach(item => {
       item.timestamp = new Date(item.timestamp).toLocaleString('fr-FR', {
         weekday: 'long',
@@ -132,12 +142,13 @@ const fetchHistory = async () => {
       });
     });
   } catch (error) {
-    console.error('Erreur lors de la récupération de l\'historique:', error);
+    console.error('Error fetching history:', error); // Log error if fetching fails
   }
 };
 
+// Function to send the entered Java code to the backend for processing
 const sendText = async () => {
-  if(!generating.value){
+  if(!generating.value){ // Prevent sending multiple requests at once
     try {
       const response = await axios.post('http://localhost:8081/api/endpoint', {
         contentDescription: 'request',
@@ -147,57 +158,59 @@ const sendText = async () => {
           'Content-Type': 'application/json',
         },
       });
-      await fetchHistory(); // Rafraîchit l'historique
+      await fetchHistory(); // Refresh the history after sending the code
       serverResponse.value = {
         success: response.data.success,
         message: response.data.compilerResponse || 'No message'
       };
-      const sse = new EventSource('http://localhost:8081/api/response'); // SERVEUR SENT EVENT
+
+      // Create an EventSource for receiving LLM responses
+      const sse = new EventSource('http://localhost:8081/api/response');
       sse.onmessage = (e) => {
         const boxer = JSON.parse(e.data);
-        console.log(boxer);
-        if (boxer.contentDescription === "token") { // when token received
-          llmResponse.value += boxer.content;
+        if (boxer.contentDescription === "token") {
+          llmResponse.value += boxer.content; // Append new token to LLM response
         }
-        if (boxer.contentDescription === "start") { // clean the other result
-          llmResponse.value = "";
-          generating.value = true;
+        if (boxer.contentDescription === "start") {
+          llmResponse.value = ""; // Clear previous response when new generation starts
+          generating.value = true; // Indicate that the LLM is generating
         }
-        if (boxer.contentDescription === "end") { // close the sse
-          sse.close();
-          fetchHistory();
-          generating.value = false;
+        if (boxer.contentDescription === "end") {
+          sse.close(); // Close the SSE connection once the generation ends
+          fetchHistory(); // Refresh the history
+          generating.value = false; // Reset generating state
         }
       };
     } catch (error) {
-      console.error('Erreur lors de l\'envoi des données:', error);
+      console.error('Error sending data:', error); // Log error if sending fails
     }
   }
 };
 
-// Alterne l'affichage de la boîte de conseils
+// Function to toggle the visibility of the advice box
 const toggleAdviceBox = () => {
   isAdviceBoxVisible.value = !isAdviceBoxVisible.value;
 };
 
-// Chargement initial de l'historique
+// Function to load history data when the component is mounted
 onMounted(async () => {
-  document.body.style.backgroundColor = '#eceff1';
-  await fetchHistory();
+  document.body.style.backgroundColor = '#eceff1'; // Set background color
+  await fetchHistory(); // Fetch the history data on mount
 });
 
+// Function to send the selected model to the backend
 const sendModel = async (model) => {
-  if(!generating.value){
-    modelName.value = model;
+  if(!generating.value){ // Prevent changing model during generation
+    modelName.value = model; // Update the current model
     try {
       const response = await axios.post('http://localhost:8081/api/model', model, {
         headers: {
           'Content-Type': 'text/plain'
         }
       });
-      console.log('Response:', response.data);
+      console.log('Response:', response.data); // Log server response
     } catch (error) {
-      console.error('Error sending model:', error);
+      console.error('Error sending model:', error); // Log error if model sending fails
     }
   }
 };

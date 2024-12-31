@@ -10,7 +10,7 @@ public final class CompilerTest {
 
   @Test
   public void testCompileValidCode() throws IOException {
-    String validJavaCode = """
+    var validJavaCode = """
           public class Animal {
               private final String name;
               public Animal(String name) {
@@ -22,15 +22,13 @@ public final class CompilerTest {
           }
       """;
 
-    String output = Compiler.compile(validJavaCode);
-    System.out.println(output);
-
+    var output = Compiler.compile(validJavaCode);
     assertTrue(output.contains("Compilation successful"));
   }
 
   @Test
   public void testCompileInvalidCode() throws IOException {
-    String invalidJavaCode = """
+    var invalidJavaCode = """
           public class Animal {
               private final String name;
               public Animall(String name) { // Typo in constructor name
@@ -42,15 +40,13 @@ public final class CompilerTest {
           }
       """;
 
-    String output = Compiler.compile(invalidJavaCode);
-    System.out.println(output);
-
+    var output = Compiler.compile(invalidJavaCode);
     assertTrue(output.contains("Compilation failed"));
   }
 
   @Test
   public void testCompileCodeWithParser() throws IOException {
-    String javaCodeWithClass = """
+    var javaCodeWithClass = """
           public class Animal123 {
               private final String name;
               public Animal123(String name) {
@@ -62,27 +58,23 @@ public final class CompilerTest {
           }
       """;
 
-    String output = Compiler.compile(javaCodeWithClass);
-    System.out.println(output);
-
+    var output = Compiler.compile(javaCodeWithClass);
     // Since the parser should rename the class to 'Test', check if the output is correct
     assertTrue(output.contains("Compilation successful"));
   }
 
   @Test
   public void testCompileEmptyCode() throws IOException {
-    String emptyJavaCode = "";
+    var emptyJavaCode = "";
 
-    String output = Compiler.compile(emptyJavaCode);
-    System.out.println(output);
-
+    var output = Compiler.compile(emptyJavaCode);
     // Empty code should success compilation
     assertTrue(output.contains("Compilation successful"));
   }
 
   @Test
   public void testCompileWithSyntaxError() throws IOException {
-    String codeWithSyntaxError = """
+    var codeWithSyntaxError = """
           public class Animal {
               private final String name
               public Animal(String name) { // Missing semicolon in the previous line
@@ -91,8 +83,7 @@ public final class CompilerTest {
           }
       """;
 
-    String output = Compiler.compile(codeWithSyntaxError);
-    System.out.println(output);
+    var output = Compiler.compile(codeWithSyntaxError);
 
     // Compilation should fail due to a syntax error
     assertTrue(output.contains("Compilation failed"));

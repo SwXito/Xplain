@@ -13,6 +13,8 @@ import org.mockito.*;
 import java.io.IOException;
 import java.util.List;
 
+import static io.smallrye.common.constraint.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -59,36 +61,29 @@ class ControllerTest {
 
   @Test
   void testStreamResponse() {
-    // Arrange
     var token1 = new SimpleBoxer("token", "Response token 1");
     var token2 = new SimpleBoxer("token", "Response token 2");
 
-    // Mocking the stream
     var multi = Multi.createFrom().items(token1, token2);
     when(llmService.generateCompleteResponse()).thenReturn(multi);
 
-    // Act
     var responseStream = controller.streamResponse();
 
-    // Assert
     responseStream.subscribe().with(item -> {
-      assert(item.contentDescription().equals("token"));
-      assert(item.content().equals("Response token 1") || item.content().equals("Response token 2"));
+      assertEquals("token", item.contentDescription());
+      assertTrue(item.content().equals("Response token 1") || item.content().equals("Response token 2"));
     });
   }
 
   @Test
   void testGetHistory() {
-    // Arrange
     when(dbService.getAllResponses()).thenReturn(List.of(
       new HistoryDTO("", "", "", "", "", true)));
 
-    // Act
     var response = controller.getHistory();
 
-    // Assert
     verify(dbService).getAllResponses();
-    assert(response.getStatus() == 200);
+    assertEquals(200, response.getStatus());
     assert(response.getEntity() instanceof java.util.List);
     java.util.List<?> responses = (java.util.List<?>) response.getEntity();
     assert(!responses.isEmpty());
@@ -96,18 +91,15 @@ class ControllerTest {
 
   @Test
   void testReceiveModel() {
-    // Arrange
     var modelName = "light";
 
-    // Act
     var response = controller.receiveModel(modelName);
 
-    // Assert
     verify(llmService).changeModel(eq(modelName));
-    assert(response.getStatus() == 200);
+    assertEquals(200, response.getStatus());
     assert(response.getEntity() instanceof SimpleBoxer);
     var simpleBoxer = (SimpleBoxer) response.getEntity();
-    assert(simpleBoxer.contentDescription().equals("model"));
-    assert(simpleBoxer.content().equals(modelName));
+    assertEquals("model", simpleBoxer.contentDescription());
+    assertEquals(modelName, simpleBoxer.content());
   }
 }

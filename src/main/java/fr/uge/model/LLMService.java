@@ -62,7 +62,7 @@ public class LLMService {
    * @param parameters the parameters required to generate the response
    * @param model the name of the model currently used
    */
-  private record RequestData(long id, InferenceParameters parameters, String model) {
+  public record RequestData(long id, InferenceParameters parameters, String model) {
   }
 
   // Injecting DBService for database interactions

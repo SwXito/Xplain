@@ -117,7 +117,7 @@ public final class Controller {
     content = @Content(schema = @Schema(type = SchemaType.ARRAY, implementation = SimpleBoxer.class))
   )
   public Response getHistory() {
-    return Response.ok(dbService.getAllResponses()).build();
+    return Response.ok(dbService.getAllResponses().reversed()).build();
   }
 
   /**

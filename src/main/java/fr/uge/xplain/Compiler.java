@@ -135,7 +135,7 @@ public final class Compiler {
     if (success) {
       return "Compilation successful\n" + output;
     }
-    return "Compilation failed\n" + error + output;
+    return "Compilation failed\n" + error.replace("/AnonymousSource.java:", "") + output;
   }
 
 }
